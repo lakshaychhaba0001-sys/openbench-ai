@@ -40,14 +40,14 @@ Agent and multi-turn evaluation is planned for after v0.5.0.
 
 ## Milestones
 
-Dates are targets, not promises. Each milestone ends in a gate and an installable pre-release on PyPI, so you can try features early.
+The milestones run in order, and each one ends in a gate and an installable pre-release on PyPI, so you can try features early. There are no fixed dates: work lands when it meets its gate.
 
-| Milestone | Target | Main work | Gate |
-| --- | --- | --- | --- |
-| **1. Foundations** | Dec 2026 – Jan 2027 | Plugin interface, OpenAI-compatible adapter, concurrency and costs, Windows/macOS CI, cache locking, real-model CI | **Alpha 1**: any supported model runs the full workflow end to end |
-| **2. Statistics and judges** | Feb – Mar 2027 | Multi-model ranking, sample-size planner, LLM judge with bias checks, judge–human agreement, variance components, continuous equivalence | **Alpha 2**: every new method passes its reference tests and calibration |
-| **3. Benchmarks and reports** | Apr 2027 | Benchmark import, semantic duplicates, contamination check, dataset cards, HTML reports, local dashboard | **Beta**: feature complete |
-| **4. Harden and release** | May 2027 | Independent review of the new statistics, documentation site, release candidate | **v0.5.0**: every release gate green on GitHub Actions |
+| Milestone | Main work | Gate |
+| --- | --- | --- |
+| **1. Foundations** | Plugin interface, OpenAI-compatible adapter, concurrency and costs, Windows/macOS CI, cache locking, real-model CI | **Alpha 1**: any supported model runs the full workflow end to end |
+| **2. Statistics and judges** | Multi-model ranking, sample-size planner, LLM judge with bias checks, judge–human agreement, variance components, continuous equivalence | **Alpha 2**: every new method passes its reference tests and calibration |
+| **3. Benchmarks and reports** | Benchmark import, semantic duplicates, contamination check, dataset cards, HTML reports, local dashboard | **Beta**: feature complete |
+| **4. Harden and release** | Independent review of the new statistics, documentation site, release candidate | **v0.5.0**: every release gate green on GitHub Actions |
 
 ## Release gates
 
@@ -67,4 +67,4 @@ Every theme has an entry point. Look for these labels:
 - [`good first issue`](https://github.com/lakshaychhaba0001-sys/openbench-ai/labels/good%20first%20issue): small, well-scoped tasks with pointers to the code.
 - [`help wanted`](https://github.com/lakshaychhaba0001-sys/openbench-ai/labels/help%20wanted): larger features. Please comment with your plan before starting, so we can agree on the design.
 
-Questions and ideas are welcome in [Discussions](https://github.com/lakshaychhaba0001-sys/openbench-ai/discussions). This roadmap is updated as milestones close; the [v0.5.0 roadmap issue](https://github.com/lakshaychhaba0001-sys/openbench-ai/issues?q=is%3Aissue+in%3Atitle+%22v0.5.0+roadmap%22) tracks progress.
+Questions and ideas are welcome in [Discussions](https://github.com/lakshaychhaba0001-sys/openbench-ai/discussions). This roadmap is updated as milestones close; the pinned [v0.5.0 roadmap issue (#24)](https://github.com/lakshaychhaba0001-sys/openbench-ai/issues/24) tracks progress.
