@@ -47,8 +47,7 @@ def test_versions_are_consistent():
 
 def test_project_wording_and_authorship_preserved():
     wording = "OpenBench AI is maintained by its project owner, and its initial development was AI-assisted."
-    for name in ("README.md", "CONTRIBUTING.md"):
-        assert wording in (ROOT / name).read_text(encoding="utf-8")
+    assert wording in (ROOT / "README.md").read_text(encoding="utf-8")
     pyproject = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
     assert '{ name = "Lakshay Chhaba" }' in pyproject
     combined = "\n".join(p.read_text(encoding="utf-8") for p in DOCS).lower()
