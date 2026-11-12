@@ -37,7 +37,7 @@ python -m pip install -e .
 python examples/v040_workflow.py demo   # writes comparison, variability, preference and audit reports to demo/
 ```
 
-> **Note**: OpenBench AI is maintained by its project owner, and its initial development was AI-assisted. Contributions, bug reports, and new datasets are welcome: see [CONTRIBUTING.md](CONTRIBUTING.md) and the [good first issues](https://github.com/lakshaychhaba0001-sys/openbench-ai/labels/good%20first%20issue).
+> **Note**: OpenBench AI is maintained by its project owner, and its initial development was AI-assisted. Contributions, bug reports, and new datasets are welcome: see [CONTRIBUTING.md](CONTRIBUTING.md), the [good first issues](https://github.com/lakshaychhaba0001-sys/openbench-ai/labels/good%20first%20issue) and the [v0.5.0 roadmap](ROADMAP.md).
 
 ---
 
