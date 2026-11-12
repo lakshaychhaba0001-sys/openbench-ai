@@ -4,7 +4,7 @@ Thank you for your interest in contributing to **OpenBench AI**!
 
 ## Project Maintenance & Governance
 
-OpenBench AI is maintained by its project owner, and its initial development was AI-assisted. We welcome bug fixes, dataset expansions, evaluation metrics, provider adapters, and documentation improvements from the open-source community.
+OpenBench AI is maintained by its project owner. We welcome bug fixes, dataset expansions, evaluation metrics, provider adapters, and documentation improvements from the open-source community.
 
 ---
 
