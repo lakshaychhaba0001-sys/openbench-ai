@@ -75,7 +75,7 @@ def load_ids_file(file_path: str | Path) -> IdFilterSpec:
         )
 
     try:
-        raw_text = target.read_text(encoding="utf-8")
+        raw_text = target.read_text(encoding="utf-8-sig")
     except UnicodeDecodeError as exc:
         raise DatasetValidationError(
             f"ID filter file is not valid UTF-8 text: {exc}",
@@ -392,7 +392,7 @@ class DatasetLoader:
         records: list[DatasetRecord] = []
         seen_ids: dict[str, int] = {}
 
-        raw_text = target.read_text(encoding="utf-8")
+        raw_text = target.read_text(encoding="utf-8-sig")
         lines = raw_text.splitlines()
 
         if not lines or all(not line.strip() for line in lines):
