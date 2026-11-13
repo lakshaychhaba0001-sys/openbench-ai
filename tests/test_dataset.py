@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from openbench.dataset import DatasetLoader, DatasetRecord
+from openbench.dataset import DatasetLoader, DatasetRecord, load_ids_file
 from openbench.exceptions import DatasetValidationError, EmptyDatasetError
 
 
@@ -217,3 +217,47 @@ def test_load_directory_combines_files_and_detects_cross_file_duplicates(
     )
     with pytest.raises(DatasetValidationError, match="Duplicate record ID 'a_1'"):
         DatasetLoader.load_directory(tmp_path)
+
+
+@pytest.mark.parametrize("newline", ["\n", "\r\n"])
+def test_utf8_bom_preserves_dataset_records_and_checksum(tmp_path: Path, newline: str) -> None:
+    record = {
+        "id": "r_001",
+        "category": "reasoning",
+        "prompt": "café Ελληνικά \ufeff text",
+        "expected_answer": "世界",
+    }
+    payload = (json.dumps(record, ensure_ascii=False) + newline).encode("utf-8")
+    plain_file = tmp_path / "plain.jsonl"
+    bom_file = tmp_path / "bom.jsonl"
+    plain_file.write_bytes(payload)
+    bom_file.write_bytes(b"\xef\xbb\xbf" + payload)
+
+    plain = DatasetLoader.load_file(plain_file)
+    with_bom = DatasetLoader.load_file(bom_file)
+
+    assert [item.to_dict() for item in with_bom] == [item.to_dict() for item in plain]
+    assert with_bom.records[0].prompt == record["prompt"]
+    assert with_bom.records[0].expected_answer == record["expected_answer"]
+    assert with_bom.checksum == plain.checksum
+
+
+@pytest.mark.parametrize("newline", ["\n", "\r\n"])
+@pytest.mark.parametrize("file_format", ["txt", "json"])
+def test_utf8_bom_preserves_id_filters_and_checksum(
+    tmp_path: Path, newline: str, file_format: str
+) -> None:
+    ids = ["r_001", "r_002", "r_001"]
+    content = json.dumps(ids) if file_format == "json" else newline.join(ids)
+    payload = (content + newline).encode("utf-8")
+    plain_file = tmp_path / f"plain.{file_format}"
+    bom_file = tmp_path / f"bom.{file_format}"
+    plain_file.write_bytes(payload)
+    bom_file.write_bytes(b"\xef\xbb\xbf" + payload)
+
+    plain = load_ids_file(plain_file)
+    with_bom = load_ids_file(bom_file)
+
+    assert with_bom.selected_ids == plain.selected_ids == ["r_001", "r_002"]
+    assert with_bom.duplicate_ids_removed == plain.duplicate_ids_removed == ["r_001"]
+    assert with_bom.checksum == plain.checksum
