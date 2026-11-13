@@ -147,7 +147,7 @@ def load_ids_file(file_path: str | Path) -> IdFilterSpec:
     return IdFilterSpec(
         selected_ids=unique_ids,
         duplicate_ids_removed=duplicates,
-        source_path=str(target),
+        source_path=target.as_posix(),
     )
 
 
@@ -446,7 +446,7 @@ class DatasetLoader:
         return Dataset(
             name=resolved_name,
             records=records,
-            source_path=str(target),
+            source_path=target.as_posix(),
             version=inferred_version,
         )
 
@@ -491,7 +491,7 @@ class DatasetLoader:
         return Dataset(
             name=resolved_name,
             records=combined_records,
-            source_path=str(target),
+            source_path=target.as_posix(),
             version="0.2.0",
         )
 
