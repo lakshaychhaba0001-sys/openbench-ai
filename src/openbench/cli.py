@@ -1597,6 +1597,25 @@ def _handle_cache(args: argparse.Namespace) -> int:
     return 2
 
 
+def _is_closed_pipe_error(exc: OSError) -> bool:
+    """True when `exc` means stdout's reader went away (EPIPE, or EINVAL on Windows)."""
+    import errno
+
+    if isinstance(exc, BrokenPipeError):
+        return True
+    # Windows reports writes to a closed pipe as EINVAL (pip handles it the same way).
+    return sys.platform == "win32" and exc.errno == errno.EINVAL
+
+
+def _exit_quietly_after_closed_stdout() -> int:
+    """Point stdout at the null device so the interpreter's final flush cannot fail, then exit 1."""
+    import os
+
+    devnull = os.open(os.devnull, os.O_WRONLY)
+    os.dup2(devnull, sys.stdout.fileno())
+    return 1
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     """Main entry point for the `openbench` CLI."""
     parser = build_parser()
@@ -1642,11 +1661,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             return _handle_preferences(args)
     except BrokenPipeError:
         # v0.4.0: output piped into a command that closed early (e.g. `| head`); exit quietly.
-        import os
-
-        devnull = os.open(os.devnull, os.O_WRONLY)
-        os.dup2(devnull, sys.stdout.fileno())
-        return 1
+        return _exit_quietly_after_closed_stdout()
     except FileNotFoundError as exc:
         print(f"Error: {sanitize_error_message(str(exc))}", file=sys.stderr)
         return 1
@@ -1654,6 +1669,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(f"Validation/Evaluation Error: {sanitize_error_message(str(exc))}", file=sys.stderr)
         return 1
     except Exception as exc:  # pragma: no cover
+        if isinstance(exc, OSError) and _is_closed_pipe_error(exc):
+            # Windows reports a closed stdout reader as OSError(EINVAL), not BrokenPipeError.
+            return _exit_quietly_after_closed_stdout()
         # v0.4.0: messages are scrubbed of embedded credentials before printing.
         print(f"Unexpected Error: {sanitize_error_message(str(exc))}", file=sys.stderr)
         return 1

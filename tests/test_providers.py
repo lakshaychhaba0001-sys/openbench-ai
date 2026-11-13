@@ -115,11 +115,13 @@ def test_ollama_adapter_non_streaming_and_streaming_with_mock_transport() -> Non
 def test_ollama_adapter_clear_connection_error_when_server_unreachable() -> None:
     """OllamaAdapter returns available=False on check_connection and raises OllamaConnectionError when server is down."""
     rec = _sample_record()
-    # Port 19999 on localhost is unused
+    # Port 19999 on localhost is unused. Linux and macOS refuse the connection at once, but Windows
+    # retries a refused connection for about two seconds, so a short timeout would turn the
+    # refusal into a timeout there.
     adapter = OllamaAdapter(
         model_name="llama3.2",
         endpoint="http://127.0.0.1:19999",
-        timeout_seconds=0.5,
+        timeout_seconds=10,
     )
     health = adapter.check_connection()
     assert health.available is False

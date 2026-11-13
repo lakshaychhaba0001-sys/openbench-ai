@@ -1,0 +1,7 @@
+# Keep LF line endings on every platform. Dataset files, run fixtures and
+# golden outputs are checked byte for byte (SHA-256), so a CRLF conversion
+# on Windows checkouts would change their checksums.
+* text=auto eol=lf
+
+*.png binary
+*.gif binary
