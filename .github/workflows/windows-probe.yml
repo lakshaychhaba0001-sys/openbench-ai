@@ -1,0 +1,22 @@
+name: Windows probe
+
+on:
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    name: Full suite on Windows (Python 3.12)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: python -m pip install -e ".[dev]"
+      - name: Pytest
+        run: python -m pytest -q -rf -p no:cacheprovider
