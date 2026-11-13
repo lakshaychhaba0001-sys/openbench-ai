@@ -1603,14 +1603,8 @@ def _is_closed_pipe_error(exc: OSError) -> bool:
 
     if isinstance(exc, BrokenPipeError):
         return True
-    if sys.platform != "win32" or exc.errno != errno.EINVAL:
-        return False
-    # EINVAL has other causes on Windows; only treat it as a closed pipe if stdout really is unwritable.
-    try:
-        sys.stdout.flush()
-    except OSError:
-        return True
-    return False
+    # Windows reports writes to a closed pipe as EINVAL (pip handles it the same way).
+    return sys.platform == "win32" and exc.errno == errno.EINVAL
 
 
 def _exit_quietly_after_closed_stdout() -> int:
