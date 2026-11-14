@@ -1,5 +1,7 @@
 # Paired model comparison (v0.4.0)
 
+For a step-by-step walkthrough, see [Reading a comparison report](reading_a_report.md).
+
 `openbench analyze` compares stored results. It never constructs or calls a model provider.
 
 ```bash
