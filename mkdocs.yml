@@ -75,6 +75,7 @@ nav:
       - Statistical methodology: statistical_methodology.md
       - Evaluation methodology: evaluation_methodology.md
   - Reference:
+      - Glossary: glossary.md
       - CLI reference: cli_reference.md
       - Python API: api_reference.md
       - Architecture: architecture.md
