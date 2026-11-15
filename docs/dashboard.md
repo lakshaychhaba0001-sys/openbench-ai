@@ -22,6 +22,10 @@ openbench serve --experiments-dir experiments --reports-dir reports --open
 # opens the dashboard in your default browser
 ```
 
+With `--host 0.0.0.0 --allow-remote --open`, the browser opens `127.0.0.1` at the
+server's actual port. The terminal still prints the wildcard bind address and the local URL.
+Wildcard IPv6 bind addresses use `[::1]` for the browser; other hosts stay unchanged.
+
 | Page | Shows |
 | --- | --- |
 | `/` | All runs (status, model, items, scores, group) and repeat groups; saved reports if `--reports-dir` is given. |

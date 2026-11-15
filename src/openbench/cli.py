@@ -2251,14 +2251,20 @@ def _handle_serve(args: argparse.Namespace) -> int:
         print(f"Error: {exc}", file=sys.stderr)
         return 2
     host, port = server.server_address[:2]
-    url = f"http://{host}:{port}/"
+    bound_host = f"[{host}]" if ":" in host else host
+    bound_url = f"http://{bound_host}:{port}/"
+    browser_host = {"0.0.0.0": "127.0.0.1", "::": "::1"}.get(host, host)
+    browser_host = f"[{browser_host}]" if ":" in browser_host else browser_host
+    url = f"http://{browser_host}:{port}/"
     if args.open:
         threading.Thread(
             target=webbrowser.open,
             args=(url,),
             daemon=True,
         ).start()
-    print(f"OpenBench dashboard (read-only) at {url}  -  press Ctrl+C to stop.")
+    print(f"OpenBench dashboard (read-only) at {bound_url}  -  press Ctrl+C to stop.")
+    if url != bound_url:
+        print(f"Local dashboard URL: {url}")
     if args.host not in ("127.0.0.1", "localhost", "::1"):
         print("Warning: listening on a non-loopback address; anyone who can reach it can read your results.", file=sys.stderr)
     try:

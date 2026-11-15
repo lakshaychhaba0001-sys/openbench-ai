@@ -122,21 +122,41 @@ def test_cli_compare_fewer_than_two_files_fails(tmp_path: Path) -> None:
     assert code == 2
 
 
-def test_cli_serve_open_opens_dashboard(monkeypatch):
+@pytest.mark.parametrize(
+    ("host", "browser_host"),
+    [("127.0.0.1", "127.0.0.1"), ("localhost", "localhost"),
+     ("0.0.0.0", "127.0.0.1"), ("::", "[::1]"), ("::1", "[::1]"),
+     ("192.0.2.1", "192.0.2.1"), ("2001:db8::1", "[2001:db8::1]")],
+)
+def test_cli_serve_open_opens_dashboard(monkeypatch, capsys, host, browser_host):
     opened = threading.Event()
     opened_urls = []
+
     def fake_open(url):
         opened_urls.append(url)
         opened.set()
         return True
+
     class FakeServer:
-        server_address = ("127.0.0.1", 8765)
+        server_address = (host, 8765)
+
         def serve_forever(self):
             raise KeyboardInterrupt  # Simulate Ctrl+C to stop the server
+
         def server_close(self):
             pass
-    monkeypatch.setattr("openbench.serve.create_server", lambda *args: FakeServer())
+
+    def fake_server(*args):
+        assert args[2:] == (host, 8765, True)
+        return FakeServer()
+
+    monkeypatch.setattr("openbench.serve.create_server", fake_server)
     monkeypatch.setattr("openbench.cli.webbrowser.open", fake_open)
-    assert main(["serve", "--open"]) == 0
+    assert main(["serve", "--host", host, "--allow-remote", "--open"]) == 0
     assert opened.wait(timeout=1)
-    assert opened_urls == ["http://127.0.0.1:8765/"]
+    assert opened_urls == [f"http://{browser_host}:8765/"]
+    printed_host = f"[{host}]" if ":" in host else host
+    output = capsys.readouterr().out
+    assert f"http://{printed_host}:8765/" in output
+    if host in ("0.0.0.0", "::"):
+        assert f"http://{browser_host}:8765/" in output
