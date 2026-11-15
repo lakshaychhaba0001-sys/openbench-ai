@@ -322,6 +322,7 @@ v0.5.0: read-only local web dashboard for runs, repeat groups and saved reports.
 | `--host` |  | `127.0.0.1` |  |  |
 | `--port` |  | `8765` |  |  |
 | `--allow-remote` |  |  |  | Allow listening on a non-loopback address (exposes your results). |
+| `--open` |  |  |  | Open the dashboard in your default browser. |
 
 ## `openbench metrics`
 

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import threading
 from pathlib import Path
 
 import pytest
@@ -119,3 +120,23 @@ def test_cli_compare_fewer_than_two_files_fails(tmp_path: Path) -> None:
     dummy.write_text("{}", encoding="utf-8")
     code = main(["compare", "--results", str(dummy), "--output", str(tmp_path / "out.md")])
     assert code == 2
+
+
+def test_cli_serve_open_opens_dashboard(monkeypatch):
+    opened = threading.Event()
+    opened_urls = []
+    def fake_open(url):
+        opened_urls.append(url)
+        opened.set()
+        return True
+    class FakeServer:
+        server_address = ("127.0.0.1", 8765)
+        def serve_forever(self):
+            raise KeyboardInterrupt  # Simulate Ctrl+C to stop the server
+        def server_close(self):
+            pass
+    monkeypatch.setattr("openbench.serve.create_server", lambda *args: FakeServer())
+    monkeypatch.setattr("openbench.cli.webbrowser.open", fake_open)
+    assert main(["serve", "--open"]) == 0
+    assert opened.wait(timeout=1)
+    assert opened_urls == ["http://127.0.0.1:8765/"]

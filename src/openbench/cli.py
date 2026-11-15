@@ -6,6 +6,8 @@ import argparse
 import json
 import re
 import sys
+import threading
+import webbrowser
 from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
@@ -593,7 +595,7 @@ def build_parser() -> argparse.ArgumentParser:
     serve_parser.add_argument("--host", type=str, default="127.0.0.1")
     serve_parser.add_argument("--port", type=int, default=8765)
     serve_parser.add_argument("--allow-remote", action="store_true", help="Allow listening on a non-loopback address (exposes your results).")
-
+    serve_parser.add_argument("--open", action="store_true", help="Open the dashboard in your default browser.")
     # v0.5.0: metrics and plugins listings
     met_parser = subparsers.add_parser("metrics", help="v0.5.0: list built-in and plugin metrics.")
     met_sub = met_parser.add_subparsers(dest="metrics_action")
@@ -2249,7 +2251,14 @@ def _handle_serve(args: argparse.Namespace) -> int:
         print(f"Error: {exc}", file=sys.stderr)
         return 2
     host, port = server.server_address[:2]
-    print(f"OpenBench dashboard (read-only) at http://{host}:{port}/  -  press Ctrl+C to stop.")
+    url = f"http://{host}:{port}/"
+    if args.open:
+        threading.Thread(
+            target=webbrowser.open,
+            args=(url,),
+            daemon=True,
+        ).start()
+    print(f"OpenBench dashboard (read-only) at {url}  -  press Ctrl+C to stop.")
     if args.host not in ("127.0.0.1", "localhost", "::1"):
         print("Warning: listening on a non-loopback address; anyone who can reach it can read your results.", file=sys.stderr)
     try:

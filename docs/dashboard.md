@@ -18,8 +18,8 @@ openbench rank --runs run_<a> run_<b> run_<c> --metric exact_match --format html
 ## `openbench serve`: a read-only local dashboard
 
 ```bash
-openbench serve --experiments-dir experiments --reports-dir reports
-# then open http://127.0.0.1:8765/
+openbench serve --experiments-dir experiments --reports-dir reports --open
+# opens the dashboard in your default browser
 ```
 
 | Page | Shows |
