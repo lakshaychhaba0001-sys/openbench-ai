@@ -47,6 +47,7 @@ nav:
       - Reading a comparison report: reading_a_report.md
       - Ranking and planning: ranking_and_planning.md
       - Repeated runs: repeated_runs.md
+      - Comparing a fine-tuned model: cookbook_finetune.md
       - Human preferences: human_preferences.md
       - LLM judge: llm_judge.md
   - Running models:
