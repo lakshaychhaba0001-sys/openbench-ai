@@ -51,6 +51,33 @@ in the [provider](providers.md) that serves your models, set the model IDs
 and versions to the actual checkpoints and configure its endpoint or key
 where required. Check the seed status in the resulting run.
 
+## Switch to real models
+
+Before running an evaluation against a local or hosted server, verify
+connectivity and model availability with `openbench providers check`:
+
+```bash
+openbench providers check ollama --endpoint http://localhost:11434 --model base-model
+openbench providers check openai_compatible --endpoint http://localhost:8000/v1 --model fine-tuned-model
+```
+
+Once the provider responds, run the same `openbench run` commands with
+`--provider ollama` or `--provider openai_compatible` and your model
+identifiers:
+
+```bash
+# Local Ollama server
+openbench run --dataset holdout.jsonl --provider ollama --endpoint http://localhost:11434 --model base-model --metrics exact_match --no-cache > base-run.txt
+openbench run --dataset holdout.jsonl --provider ollama --endpoint http://localhost:11434 --model fine-tuned-model --metrics exact_match --no-cache --repetitions 3 --seed 100 > fine-tuned-run.txt
+
+# OpenAI-compatible endpoint (vLLM, llama.cpp server, LM Studio, or hosted API)
+openbench run --dataset holdout.jsonl --provider openai_compatible --endpoint http://localhost:8000/v1 --model base-model --metrics exact_match --no-cache > base-run.txt
+openbench run --dataset holdout.jsonl --provider openai_compatible --endpoint http://localhost:8000/v1 --model fine-tuned-model --metrics exact_match --no-cache --repetitions 3 --seed 100 > fine-tuned-run.txt
+```
+
+See [Model Providers](providers.md) for authentication (`--api-key-env`),
+rate-limiting (`--max-requests-per-minute`), and seed-forwarding details.
+
 ## Compare the arms and read the result
 
 Extract the run ID and repeat-group ID printed by the two commands:
@@ -76,6 +103,23 @@ have four items. On a real evaluation, look for opposing changes or small
 groups before interpreting the overall result. These default breakdowns
 are descriptive. See [Reading a comparison report](reading_a_report.md)
 for the assumptions and warnings.
+
+## Formal per-category tests
+
+The default **By category (descriptive)** tables in `comparison.md` are
+descriptive summaries only and do not run hypothesis tests per category.
+To run formal, multiplicity-adjusted paired tests within each category,
+pass `--stratum-tests` to `openbench analyze`:
+
+```bash
+openbench analyze --runs "$base_id" "$fine_tuned_group" --baseline "$base_id" --metrics exact_match --seed 41 --stratum-tests --format markdown --output comparison-strata.md
+```
+
+Testing many small categories reduces statistical power within each group
+and increases the multiple-testing adjustment across strata, so interpret
+per-category p-values alongside group sample sizes and confidence intervals.
+See [Statistical methodology](statistical_methodology.md) for details on
+stratified resampling and familywise error control.
 
 ## Audit the holdout against the fine-tuning corpus
 
