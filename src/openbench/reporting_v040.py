@@ -23,6 +23,11 @@ from openbench.reporting import escape_markdown_cell
 from openbench.security import csv_safe
 
 MD_DISPLAY_LIMIT = 50
+REPORT_DOC_LINKS = (
+    ("Reading guide", "https://lakshaychhaba0001-sys.github.io/openbench-ai/reading_a_report/"),
+    ("Glossary", "https://lakshaychhaba0001-sys.github.io/openbench-ai/glossary/"),
+)
+REPORT_DOC_MARKDOWN = " · ".join(f"[{label}]({url})" for label, url in REPORT_DOC_LINKS)
 
 
 def to_json(payload: dict[str, Any]) -> str:
@@ -110,9 +115,9 @@ def render_analysis(payload: dict[str, Any], fmt_name: str) -> str:
     kind = payload.get("analysis")
     if fmt_name == "markdown":
         if kind == "paired_comparison":
-            return paired_markdown(payload)
+            return f"{paired_markdown(payload)}\n{REPORT_DOC_MARKDOWN}\n"
         if kind == "repeated_run_variability":
-            return variability_markdown(payload)
+            return f"{variability_markdown(payload)}\n{REPORT_DOC_MARKDOWN}\n"
     if fmt_name == "csv":
         if kind == "paired_comparison":
             return paired_csv(payload)

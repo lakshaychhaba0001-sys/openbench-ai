@@ -221,11 +221,33 @@ def test_analyze_and_rank_html_are_self_contained_and_escaped(tmp_path, capsys):
     assert page.startswith("<!doctype html>") and "Content-Security-Policy" in page
     assert "<script>" not in page and "&lt;script&gt;" in page
     body = page.split("<main>")[1].replace('xmlns="http://www.w3.org/2000/svg"', "")
+    links = (
+        "https://lakshaychhaba0001-sys.github.io/openbench-ai/reading_a_report/",
+        "https://lakshaychhaba0001-sys.github.io/openbench-ai/glossary/",
+    )
+    for url in links:
+        assert f'href="{url}"' in body
+        body = body.replace(url, "")
     assert "<svg" in page and "http://" not in body and "https://" not in body and "src=" not in page
     assert main(["rank", "--results", str(a), str(b), "--metric", "exact_match", "--format", "html",
                  "--resamples", "300", "--permutations", "999"]) == 0
     html_rank = capsys.readouterr().out
     assert "Model ranking" in html_rank and "<script>" not in html_rank
+    assert all(f'href="{url}"' in html_rank for url in links)
+
+
+def test_markdown_reports_link_to_the_documentation(tmp_path, capsys):
+    a, b = _files(tmp_path, name_b="model-b")
+    inputs = ["--results", str(a), str(b), "--resamples", "300", "--permutations", "999"]
+    for command in (
+        ["analyze", *inputs],
+        ["rank", *inputs, "--metric", "exact_match"],
+        ["plan", "--items", "200", "--baseline-accuracy", "0.7"],
+    ):
+        assert main([*command, "--format", "markdown"]) == 0
+        footer = capsys.readouterr().out.strip().splitlines()[-1]
+        assert "[Reading guide](https://lakshaychhaba0001-sys.github.io/openbench-ai/reading_a_report/)" in footer
+        assert "[Glossary](https://lakshaychhaba0001-sys.github.io/openbench-ai/glossary/)" in footer
 
 
 # ---------------------------------------------------------------------------------------------

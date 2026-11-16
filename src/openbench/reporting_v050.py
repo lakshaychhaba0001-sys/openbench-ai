@@ -10,7 +10,16 @@ from __future__ import annotations
 from typing import Any
 
 from openbench.exceptions import ConfigurationError
-from openbench.reporting_v040 import _csv, _provenance_md, _table, fmt, fmt_ci, fmt_p, to_json
+from openbench.reporting_v040 import (
+    REPORT_DOC_MARKDOWN,
+    _csv,
+    _provenance_md,
+    _table,
+    fmt,
+    fmt_ci,
+    fmt_p,
+    to_json,
+)
 
 
 def _check_format(fmt_name: str) -> str:
@@ -59,6 +68,7 @@ def render_ranking(payload: dict[str, Any], fmt_name: str) -> str:
     if payload.get("warnings"):
         lines += ["", "## Warnings", ""] + [f"- `{w['code']}`: {w['message']}" for w in payload["warnings"]]
     lines += [""] + _provenance_md(payload.get("provenance"))
+    lines.append(REPORT_DOC_MARKDOWN)
     return "\n".join(lines) + "\n"
 
 
@@ -80,6 +90,7 @@ def render_plan(payload: dict[str, Any], fmt_name: str) -> str:
     if payload.get("assumption"):
         lines += ["", f"Assumption: {payload['assumption']}."]
     lines += ["", "Plans are approximate: they assume the items you will use behave like the inputs given here.", ""]
+    lines.append(REPORT_DOC_MARKDOWN)
     return "\n".join(lines) + "\n"
 
 
