@@ -9,9 +9,12 @@ Statistically sound LLM benchmarking in Python: any model, paired comparison and
 [![Tests](https://github.com/lakshaychhaba0001-sys/openbench-ai/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/lakshaychhaba0001-sys/openbench-ai/actions/workflows/tests.yml)
 [![Release](https://img.shields.io/github/v/release/lakshaychhaba0001-sys/openbench-ai?color=2ea44f)](https://github.com/lakshaychhaba0001-sys/openbench-ai/releases/latest)
 [![PyPI](https://img.shields.io/pypi/v/openbench-ai?color=2ea44f)](https://pypi.org/project/openbench-ai/)
+[![Docs](https://img.shields.io/badge/docs-online-blue.svg)](https://lakshaychhaba0001-sys.github.io/openbench-ai/)
 [![Python 3.10–3.13](https://img.shields.io/badge/Python-3.10%E2%80%933.13-3776AB.svg)](pyproject.toml)
 [![Runtime dependencies: none](https://img.shields.io/badge/runtime%20dependencies-none-blue.svg)](pyproject.toml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
+Full documentation: [OpenBench AI docs](https://lakshaychhaba0001-sys.github.io/openbench-ai/).
 
 <img src="docs/assets/demo.gif" alt="Terminal demo: a read-only dataset audit, then the end-to-end example running repeated runs, a paired comparison with an adjusted p-value and confidence interval, variability, blinded preferences and a group audit" width="860">
 
