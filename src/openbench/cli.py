@@ -502,7 +502,7 @@ def build_parser() -> argparse.ArgumentParser:
     runs_compare_p.add_argument("run_ids", nargs="+", help="Two or more experiment run IDs.")
     runs_compare_p.add_argument("--experiments-dir", type=str, default=None)
     runs_compare_p.add_argument("--output", type=str, default=None)
-    runs_compare_p.add_argument("--format", choices=["text", "json", "markdown"], default="text")
+    runs_compare_p.add_argument("--format", choices=["text", "json", "markdown", "csv"], default="text")
 
     # v0.5.0: rank, plan, judge
     rank_parser = subparsers.add_parser(
@@ -1868,6 +1868,8 @@ def _handle_runs(args: argparse.Namespace) -> int:
 
         if args.format == "json":
             print(ReportGenerator.to_json(comparison))
+        elif args.format == "csv":
+            print(ReportGenerator.to_csv(comparison), end="")
         else:
             print(ReportGenerator.comparison_to_markdown(comparison))
         return 0
