@@ -115,11 +115,14 @@ pass `--stratum-tests` to `openbench analyze`:
 openbench analyze --runs "$base_id" "$fine_tuned_group" --baseline "$base_id" --metrics exact_match --seed 41 --stratum-tests --format markdown --output comparison-strata.md
 ```
 
-Testing many small categories reduces statistical power within each group
-and increases the multiple-testing adjustment across strata, so interpret
-per-category p-values alongside group sample sizes and confidence intervals.
-See [Statistical methodology](statistical_methodology.md) for details on
-stratified resampling and familywise error control.
+With `--stratum-tests`, the per-category (and per-difficulty) tests join
+the same Holm family as the overall comparison, so the overall result's
+adjusted p-value in `comparison-strata.md` becomes more conservative than
+in `comparison.md`. Testing many small groups also reduces statistical
+power within each group, so interpret per-category p-values alongside
+group sample sizes and confidence intervals. See
+[Multiple comparisons](statistical_methodology.md#6-multiple-comparisons)
+for details on familywise error control.
 
 ## Audit the holdout against the fine-tuning corpus
 
