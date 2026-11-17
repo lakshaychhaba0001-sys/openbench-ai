@@ -77,8 +77,8 @@ class Dashboard:
         if group:
             active.append(f"group={esc(group)}")
         if active:
-            body.append(f"<p class=\"meta\">Active filters: {', ' .join(active)}."
-                        f"<a href=\"/\">Show all runs</a></p>")
+            body.append(f"<p class=\"meta\">Active filters: {', '.join(active)}."
+                        f" <a href=\"/\">Show all runs</a></p>")
         if rows:
             body.append(self._linked_table(["Run", "Status", "Model", "Items", "Scores", "Group", "Created"], rows,
                                            link_cols={0: "/runs/", 5: "/groups/"}))

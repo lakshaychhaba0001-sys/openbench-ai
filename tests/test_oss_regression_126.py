@@ -53,6 +53,7 @@ def test_dashboard_runs_filter(tmp_path, capsys):
 
         body = get_page("?status=completed")
         assert "status=completed" in body
+        assert 'Active filters: status=completed. <a href="/">Show all runs</a>' in body
         for run_id in all_ids:
             assert run_id in body
 
