@@ -169,7 +169,11 @@ class ReportGenerator:
         """Write CSV report to disk and return the resolved path."""
         target = Path(output_path)
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text(ReportGenerator.to_csv(result, mode=mode), encoding="utf-8")
+        # newline="" writes the text exactly as csv.writer produced it. Without it,
+        # text mode on Windows turns each "\n" of the "\r\n" row ending into "\r\n" again.
+        target.write_text(
+            ReportGenerator.to_csv(result, mode=mode), encoding="utf-8", newline=""
+        )
         return target
 
     @staticmethod

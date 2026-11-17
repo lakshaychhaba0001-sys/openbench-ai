@@ -98,3 +98,13 @@ def test_inference_config_secrets_are_redacted_everywhere_in_json_report() -> No
     loaded = json.loads(payload)
     assert loaded["model"]["inference_config"]["api_key"] == "[REDACTED]"
     assert loaded["model"]["inference_config"]["temperature"] == 0.0
+
+
+def test_save_csv_writes_single_crlf_line_endings(tmp_path: Path) -> None:
+    """Saved CSV bytes match to_csv() exactly, so no row ends in a doubled carriage return."""
+    result = _create_sample_result()
+    csv_path = ReportGenerator.save_csv(result, tmp_path / "report.csv")
+
+    raw = csv_path.read_bytes()
+    assert b"\r\r\n" not in raw
+    assert raw == ReportGenerator.to_csv(result).encode("utf-8")
