@@ -1,6 +1,6 @@
 # Reading a model comparison report
 
-This guide walks through an OpenBench AI v0.4.0 report from a [paired comparison](glossary.md#paired-comparison) using the offline mock provider. It explains how to read the result, understand the statistical test, and interpret warnings without overstating what the evidence shows.
+This guide walks through an OpenBench AI report from a [paired comparison](glossary.md#paired-comparison) using the offline mock provider. It explains how to read the result, understand the statistical test, and interpret warnings without overstating what the evidence shows.
 
 ## 1. Generate the example report
 
@@ -185,7 +185,7 @@ The report's limitations section highlights several important boundaries:
 - Results apply to the analysed models, prompts, generation settings, references and items.
 - A non-significant difference does not establish equivalence.
 - Confidence intervals are not adjusted for multiple comparisons.
-- Continuous-metric equivalence testing is disabled in v0.4.0.
+- Equivalence for continuous metrics is descriptive only unless the bounded test is requested (`--continuous-equivalence empirical_bernstein`).
 - Category and difficulty breakdowns are [descriptive only](glossary.md#descriptive-only) unless stratum tests are requested.
 
 Always read this section before using a comparison to make a model-selection decision.

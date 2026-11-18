@@ -1,4 +1,4 @@
-# Results anyone can read: HTML reports and the local dashboard (v0.5.0)
+# Results anyone can read: HTML reports and the local dashboard
 
 ## Self-contained HTML reports
 

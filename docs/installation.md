@@ -27,10 +27,11 @@ python -m pip install -e .
 
 ```bash
 openbench --version
-# Expected output: openbench 0.4.0
+# Expected output (Python version and platform will differ):
+# openbench 0.5.0 (Python 3.12.4, Linux-6.8.0-x86_64-with-glibc2.39)
 
 python -c "import openbench; print(openbench.__version__)"
-# Expected output: 0.4.0
+# Expected output: 0.5.0
 ```
 
 ## 4. Optional Extras
@@ -43,9 +44,10 @@ python -c "import openbench; print(openbench.__version__)"
 | `semantic` | sentence-transformers | Neural `semantic_similarity` |
 | `huggingface` | transformers, torch | The experimental Hugging Face adapter |
 | `stats-ref` | numpy, scipy, statsmodels | **Tests only**: the statistical reference cross-checks in `tests/reference`. The library never imports them. |
+| `docs` | mkdocs, mkdocs-material | Building the documentation site |
 | `all` | All runtime integrations above | |
 
-All v0.4.0 features (statistics, repeated runs, paired comparison, preferences, audits, reports) need no extra.
+Statistics, repeated runs, paired comparison, ranking, sample-size planning, the LLM judge, human preferences, HTML reports and the dashboard need no extra. Audits need none either, except the semantic near-duplicate check, which uses `semantic`.
 
 ## 5. Offline / Air-Gapped Environment Installation
 

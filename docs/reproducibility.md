@@ -1,4 +1,4 @@
-# Reproducibility and reporting (v0.4.0)
+# Reproducibility and reporting
 
 ## What every v0.4.0 report records
 

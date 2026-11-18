@@ -1,4 +1,4 @@
-# Optional Model Integrations & Adapters (v0.2.0)
+# Optional Model Integrations & Adapters
 
 OpenBench AI keeps its core evaluation engine completely independent of external inference servers and paid APIs. When you want to generate responses programmatically rather than loading a static JSON file, use the `openbench.adapters` package.
 

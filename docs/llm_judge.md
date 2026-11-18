@@ -1,4 +1,4 @@
-# LLM-as-judge with bias controls (v0.5.0)
+# LLM-as-judge with bias controls
 
 `openbench judge` asks a third model which of two responses is better, for every item two
 runs share. It is built to be **measured, not trusted**: it reports how consistent and how

@@ -1,4 +1,4 @@
-# Model Providers & Adapter Framework (v0.3.0)
+# Model Providers & Adapter Framework
 
 OpenBench AI provides a unified adapter architecture in `openbench.adapters` so local inference servers, local Python functions, Hugging Face pipelines, and deterministic test mocks share a single contract.
 

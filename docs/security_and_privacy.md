@@ -1,4 +1,4 @@
-# Security and Privacy Architecture (v0.3.1)
+# Security and Privacy Architecture
 
 OpenBench AI `v0.3.1` provides layered security and privacy protections in `openbench.security`.
 

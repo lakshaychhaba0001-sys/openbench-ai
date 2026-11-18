@@ -1,4 +1,4 @@
-# Human preference evaluation (v0.4.0)
+# Human preference evaluation
 
 A local-first workflow for blinded pairwise judgements of two models' responses. No hosted service is involved, and annotations and responses never leave your machine.
 

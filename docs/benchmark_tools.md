@@ -1,4 +1,4 @@
-# Benchmarks you can trust: import, contamination checks, cards and near-duplicates (v0.5.0)
+# Benchmarks you can trust: import, contamination checks, cards and near-duplicates
 
 Four read-mostly tools for getting a benchmark into OpenBench and checking it before you trust a
 score. None of them calls a model or changes your dataset.

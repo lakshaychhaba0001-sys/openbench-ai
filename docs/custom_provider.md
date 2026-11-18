@@ -1,4 +1,4 @@
-# Implementing a Custom Model Provider (v0.3.0)
+# Implementing a Custom Model Provider
 
 Developers can extend OpenBench AI with custom model adapters by subclassing `BaseModelAdapter` and registering the class in `PROVIDER_REGISTRY`.
 

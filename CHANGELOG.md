@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [0.5.0] - 2026-11-15
 
-All of the [v0.5.0 roadmap](ROADMAP.md) themes, in four milestones. No breaking changes: v0.4.0 commands, public Python names, run directories, datasets and scores keep working, and the core install has no runtime dependencies.
+All of the [v0.5.0 roadmap](https://github.com/lakshaychhaba0001-sys/openbench-ai/blob/v0.5.0/ROADMAP.md) themes, in four milestones. No breaking changes: v0.4.0 commands, public Python names, run directories, datasets and scores keep working, and the core install has no runtime dependencies.
 
 ### Added (Milestone 1: Foundations)
 - **OpenAI-compatible adapter** (`openai_compatible`, aliases `openai`, `openai-compatible`; #8): runs any server with `/v1/chat/completions` (vLLM, LM Studio, llama.cpp server, hosted APIs). Standard library only; forwards seeds; records token usage; reads the API key from an environment variable at request time and never stores it.

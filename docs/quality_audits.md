@@ -1,4 +1,4 @@
-# Dataset and evaluation quality audits (v0.4.0)
+# Dataset and evaluation quality audits
 
 Audits are **read-only**. They never rewrite, delete, reorder or "fix" records, never change scores, and never hide a finding. Exit code 1 means at least one *error* finding; warnings and info exit 0.
 

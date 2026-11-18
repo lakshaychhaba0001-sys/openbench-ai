@@ -1,4 +1,4 @@
-# Future Dashboard Architecture & Data Contracts (v0.2.0 Preparation)
+# Dashboard design notes and data contracts
 
 > **v0.5.0:** a read-only local dashboard now exists: `openbench serve`. See [dashboard.md](dashboard.md). This page keeps the earlier design notes.
 

@@ -21,6 +21,6 @@ Describe what you expected to happen.
 Paste the exact traceback, CLI error output, or incorrect metric result.
 
 ## Environment
-- **OpenBench AI Version**: `v0.1.0`
+- **OpenBench AI Version**: e.g., `0.5.0` (run `openbench --version`)
 - **Python Version**: e.g., Python 3.11
 - **Operating System**: e.g., Ubuntu 22.04 / macOS / Windows

@@ -1,4 +1,4 @@
-# Local Ollama Integration Guide (v0.3.0)
+# Local Ollama Integration Guide
 
 `OllamaAdapter` (`openbench.adapters.OllamaAdapter`) connects OpenBench AI to a local [Ollama](https://ollama.com/) server without requiring any paid API keys or third-party Python HTTP libraries.
 

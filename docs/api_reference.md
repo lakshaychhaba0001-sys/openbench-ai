@@ -1,4 +1,4 @@
-# Python API reference (v0.4.0)
+# Python API reference
 
 Generated from `openbench.__all__` and `openbench.stats.__all__` by `scripts/generate_reference_docs.py`; do not edit by hand.
 The first 70 names are the unchanged v0.3.1 surface; v0.4.0 only appends names and appends optional parameters.

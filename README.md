@@ -57,7 +57,7 @@ python examples/v040_workflow.py demo   # writes comparison, variability, prefer
 - **Equivalence for continuous metrics**: an opt-in bounded test (`--continuous-equivalence empirical_bernstein`) with a finite-sample guarantee.
 - **Benchmarks you can trust**: `import-dataset` converts local QA and multiple-choice files; `audit-contamination` checks overlap with a corpus you supply; `dataset-card` writes a card; `--near-duplicate-method semantic` finds paraphrases. ([benchmark tools](docs/benchmark_tools.md))
 - **Results anyone can read**: `--format html` writes one self-contained, escaped report; `openbench serve` is a read-only local dashboard. ([HTML reports and dashboard](docs/dashboard.md))
-- **A platform others build on**: plugins for metrics, providers and dataset sources ([plugins](docs/plugins.md)); Windows and macOS in CI; cross-process cache locking; a [documentation site](mkdocs.yml); and a [troubleshooting page](docs/troubleshooting.md).
+- **A platform others build on**: plugins for metrics, providers and dataset sources ([plugins](docs/plugins.md)); Windows and macOS in CI; cross-process cache locking; a [documentation site](https://lakshaychhaba0001-sys.github.io/openbench-ai/); and a [troubleshooting page](docs/troubleshooting.md).
 
 Every new statistical method has reference tests and a committed calibration study ([methodology](docs/statistical_methodology.md), sections 18–22). v0.4.0 commands, public Python names, run directories, datasets and scores keep working, and the core install still has no runtime dependencies. See the [changelog](CHANGELOG.md).
 
@@ -239,13 +239,13 @@ The built-in quality audit reports 0 errors, 6 warnings and 8 informational find
 | `lexical_similarity` | `0.3.1` | continuous | Cosine similarity of hashed word and character 3-gram features. | Surface wording only; paraphrases score low and negations score high. |
 | `structured_output` | `0.2.0` | continuous | Validates JSON syntax, required keys, field types, and JSON Schema. | Structural validity is separate from factual value accuracy. |
 
-The **kind** (`score_kind`) selects the statistical procedure in `analyze`. Metric scores and versions are unchanged in v0.4.0.
+The **kind** (`score_kind`) selects the statistical procedure in `analyze`. Metric scores and versions are unchanged in v0.4.0 and v0.5.0.
 
 ---
 
 ## Statistical honesty
 
-- A non-significant difference is never reported as "no difference" or "equivalent". Equivalence requires a pre-specified margin and a TOST, and continuous-metric equivalence is disabled in v0.4.0 (descriptive only).
+- A non-significant difference is never reported as "no difference" or "equivalent". Equivalence requires a pre-specified margin and a TOST, and for continuous metrics equivalence is descriptive only unless you opt in to the bounded test (`--continuous-equivalence empirical_bernstein`, v0.5.0).
 - Exact binary equivalence p-values are computed in floating point with a documented, tested error allowance. This is an engineering bound, not a machine-checked proof.
 - Confidence intervals describe uncertainty over items for fixed models, prompts and settings. They are labelled as not adjusted for multiple comparisons.
 - A seed passed to a provider does not guarantee deterministic output.
@@ -257,7 +257,7 @@ See the [statistical methodology](docs/statistical_methodology.md).
 
 ## Documentation Index
 
-- **v0.4.0 guides**: [Repeated runs](docs/repeated_runs.md) | [Model comparison](docs/model_comparison.md) | [Reading a comparison report](docs/reading_a_report.md) | [Ranking & planning](docs/ranking_and_planning.md) | [LLM judge](docs/llm_judge.md) | [Benchmark tools](docs/benchmark_tools.md) | [HTML reports & dashboard](docs/dashboard.md) | [Human preferences](docs/human_preferences.md) | [Quality audits](docs/quality_audits.md) | [Reproducibility & reports](docs/reproducibility.md) | [Statistical methodology](docs/statistical_methodology.md) | [CLI reference](docs/cli_reference.md) | [Python API](docs/api_reference.md) | [Migration from v0.3.1](V0_4_0_MIGRATION_GUIDE.md)
+- **Comparison, ranking & reports**: [Repeated runs](docs/repeated_runs.md) | [Model comparison](docs/model_comparison.md) | [Reading a comparison report](docs/reading_a_report.md) | [Ranking & planning](docs/ranking_and_planning.md) | [LLM judge](docs/llm_judge.md) | [Benchmark tools](docs/benchmark_tools.md) | [HTML reports & dashboard](docs/dashboard.md) | [Human preferences](docs/human_preferences.md) | [Quality audits](docs/quality_audits.md) | [Reproducibility & reports](docs/reproducibility.md) | [Statistical methodology](docs/statistical_methodology.md) | [CLI reference](docs/cli_reference.md) | [Python API](docs/api_reference.md) | [Migration from v0.3.1](V0_4_0_MIGRATION_GUIDE.md)
 - **Execution, providers & integrity**: [Model Execution Engine](docs/model_execution.md) | [Providers](docs/providers.md) | [Ollama](docs/ollama.md) | [Hugging Face (experimental)](docs/huggingface.md) | [Custom providers](docs/custom_provider.md) | [Plugins](docs/plugins.md) | [Experiment tracking](docs/experiment_tracking.md) | [Performance monitoring](docs/performance_monitoring.md) | [Reliability & caching](docs/reliability.md) | [Benchmark integrity](docs/benchmark_integrity.md) | [Security & privacy](docs/security_and_privacy.md)
 - **Datasets, metrics & configuration**: [Installation](docs/installation.md) | [Usage](docs/usage.md) | [Architecture](docs/architecture.md) | [Dataset catalog](docs/dataset_catalog.md) | [Core metrics](docs/metrics.md) | [Advanced metrics](docs/advanced_metrics.md) | [YAML profiles](docs/configuration.md) | [Historical tracking](docs/historical_tracking.md) | [v0.3 compatibility](docs/v0_3_compatibility.md)
 - **Project**: [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md) | [Security policy](SECURITY.md) | [v0.3.1 compatibility report](V0_3_1_COMPATIBILITY_REPORT.md)

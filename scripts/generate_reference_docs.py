@@ -37,10 +37,10 @@ def _walk(parser: argparse.ArgumentParser, prefix: str = ""):
 
 def cli_reference() -> str:
     lines = [
-        "# CLI reference (v0.4.0)",
+        "# CLI reference",
         "",
         "Generated from the argument parser by `scripts/generate_reference_docs.py`; do not edit by hand.",
-        "Flags marked *(v0.4.0)* are new; every v0.3.1 command, flag, default and choice is unchanged.",
+        "Commands and flags marked *(v0.4.0)* were added in v0.4.0, and help text starting with `v0.5.0:` marks v0.5.0 additions. Every v0.3.1 command and flag is kept.",
         "",
     ]
     for path, parser in _walk(build_parser()):
@@ -69,7 +69,7 @@ def cli_reference() -> str:
 
 def api_reference() -> str:
     lines = [
-        "# Python API reference (v0.4.0)",
+        "# Python API reference",
         "",
         "Generated from `openbench.__all__` and `openbench.stats.__all__` by `scripts/generate_reference_docs.py`; do not edit by hand.",
         "The first 70 names are the unchanged v0.3.1 surface; v0.4.0 only appends names and appends optional parameters.",

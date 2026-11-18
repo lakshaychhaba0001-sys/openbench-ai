@@ -1,4 +1,4 @@
-# Statistical Methodology (v0.4.0)
+# Statistical Methodology
 
 This document describes the statistical primitives in `openbench.stats`. They are
 standard-library only and operate on per-item values that the caller has already aligned on

@@ -1,4 +1,4 @@
-# YAML Evaluation Configuration Profiles (v0.2.0)
+# YAML Evaluation Configuration Profiles
 
 OpenBench AI `v0.2.0` supports declarative YAML evaluation profiles via `openbench.configuration.ProfileLoader` (requires optional `PyYAML`, included in `pip install -e ".[config]"` or `".[dev]"`).
 

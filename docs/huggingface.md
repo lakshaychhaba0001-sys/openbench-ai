@@ -1,4 +1,4 @@
-# Hugging Face Integration Guide (v0.3.0 — Experimental)
+# Hugging Face Integration Guide (Experimental)
 
 `HuggingFaceAdapter` (`openbench.adapters.HuggingFaceAdapter`) provides an optional integration for running local Hugging Face `transformers` text-generation models.
 

@@ -1,4 +1,4 @@
-# Ranking several models and planning sample sizes (v0.5.0)
+# Ranking several models and planning sample sizes
 
 Two commands answer the questions that come before and after a comparison:
 

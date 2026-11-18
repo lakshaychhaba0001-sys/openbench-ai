@@ -1,4 +1,4 @@
-# Plugins: metrics, providers and dataset sources (v0.5.0)
+# Plugins: metrics, providers and dataset sources
 
 A Python package can add metrics, model providers and dataset sources to OpenBench AI without changing OpenBench itself. Installing the package is enough: OpenBench finds it through [entry points](https://packaging.python.org/en/latest/specifications/entry-points/).
 

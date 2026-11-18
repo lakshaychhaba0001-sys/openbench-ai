@@ -1,4 +1,4 @@
-# Experiment Management & Run Storage (v0.3.0)
+# Experiment Management & Run Storage
 
 OpenBench AI `v0.3.0` introduces `ExperimentManager` (`openbench.experiments`) to organize model execution runs into self-contained, verifiable directories under `experiments/run_<id>/`.
 

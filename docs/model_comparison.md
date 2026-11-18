@@ -1,4 +1,4 @@
-# Paired model comparison (v0.4.0)
+# Paired model comparison
 
 For a step-by-step walkthrough, see [Reading a comparison report](reading_a_report.md).
 
@@ -54,7 +54,7 @@ The **failure-rate comparison** tests paired failure indicators (missing or inva
 **Equivalence** requires a pre-specified [equivalence margin](glossary.md#equivalence-margin) (`--equivalence-margin`) and runs a [TOST](glossary.md#tost-two-one-sided-tests):
 
 - **Binary metrics with one repetition** use the exact unconditional score test, and are decided by the Holm-adjusted p_TOST within a separate equivalence family.
-- **Continuous metrics** are disabled for equivalence decisions in v0.4.0. Values are reported as descriptive only, with the reason `method_not_validated`.
+- **Continuous metrics** are not used for equivalence decisions by default. Values are reported as descriptive only, with the reason `method_not_validated`. An opt-in bounded test is described [below](#equivalence-for-continuous-metrics-v050).
 - **Intervals** are labelled as not adjusted for multiple comparisons.
 
 Wording rules: a non-significant difference is reported as "No statistically significant difference was detected (adjusted p = ...). The CI [L, U] is compatible with differences in this range." It is never reported as "equivalent" or "the same".

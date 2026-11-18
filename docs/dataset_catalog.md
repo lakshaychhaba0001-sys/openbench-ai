@@ -1,4 +1,4 @@
-# Dataset Catalog & Management (v0.2.0)
+# Dataset Catalog & Management
 
 OpenBench AI `v0.2.0` provides **200 original evaluation examples** across **10 benchmark categories** (20 examples per category), managed through `openbench.catalog.DatasetCatalog`.
 

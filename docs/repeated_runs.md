@@ -1,4 +1,4 @@
-# Repeated-run benchmarking (v0.4.0)
+# Repeated-run benchmarking
 
 A single run measures one sample of a model's behaviour. Sampling settings, provider-side nondeterminism and transient failures can change results from run to run. v0.4.0 lets you repeat an experiment, keeps every repetition inspectable, and reports run-to-run variability separately from item-to-item variation.
 

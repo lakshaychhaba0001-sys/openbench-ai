@@ -1,94 +1,91 @@
-# OpenBench AI roadmap: v0.5.0
+# OpenBench AI roadmap: v0.6.0
 
-> **Status: complete.** Every theme below is implemented. The work is in the four milestone pull requests linked from [#24](https://github.com/lakshaychhaba0001-sys/openbench-ai/issues/24); see the [changelog](CHANGELOG.md) for details. The [next steps](#after-v050) are at the end of this page.
+> **Status: planning.** v0.5.0 is released; see the [changelog](CHANGELOG.md). This page describes what v0.6.0 is meant to do. There are no dates: work lands when it meets its gate. Tell us what you would use in the [v0.6.0 ideas discussion](https://github.com/lakshaychhaba0001-sys/openbench-ai/discussions/153).
 
-**Goal:** a team can go from "we have three candidate models" to a shareable, statistically defensible decision report in one afternoon, on their own hardware or any hosted API.
+**Goal:** OpenBench AI should be as useful to one person choosing a model for their own work as it is to a small team running evaluations every week, and it should spend as few of their credits as possible to get there.
 
-v0.4.0 answers one question well: *is the gap between two models real?* v0.5.0 widens that to the questions teams face every week:
+v0.5.0 answers the questions a team with a benchmark faces: which model to ship, how many questions are enough, and whether a judge or a dataset can be trusted. v0.6.0 adds the questions that come next:
 
-- Which of these ten models should we ship, ranked with uncertainty?
-- How many questions do we need before the answer means anything?
-- Can we trust an LLM judge for open-ended answers, and how much?
-- Is this benchmark sound: contaminated, duplicated or ambiguous?
-- Can someone read the result without running Python?
+- Which model should I use for *my* kind of work, and is the more expensive one worth it?
+- What did this comparison cost in tokens, money and time?
+- How do I evaluate work that has no answer key?
+- Can I get the same answer while paying for fewer model calls?
+- Which prompt or setting is better, not only which model?
+- Did the model get worse since last week?
 
-Three principles stay fixed:
+These principles stay fixed:
 - The core install has no runtime dependencies.
 - Every number carries its provenance.
 - The tool never claims more than the statistics support.
+- Prices are never built in. Cost is computed only from prices you supply.
 
-Everything new is opt-in, and v0.4.0 runs, reports and APIs keep working.
+Three are new for v0.6.0:
+- **Spend the least that answers the question.** Anything that calls a model shows the expected cost first and reuses stored answers.
+- **Honest with small numbers.** With three tasks, the report says what three tasks can and cannot show.
+- **Private by default.** Your own tasks stay on your machine and go only to the provider you chose.
+
+Everything new is opt-in, and v0.5.0 commands, runs, reports and APIs keep working.
 
 ## Themes
 
-| # | Theme | What users get | Tracking |
+| # | Theme | What users get | Related issues |
 | --- | --- | --- | --- |
-| 1 | **Any model** | One adapter for every OpenAI-compatible server (vLLM, LM Studio, llama.cpp, hosted APIs); concurrent execution with rate limits; token and cost accounting | [#8](https://github.com/lakshaychhaba0001-sys/openbench-ai/issues/8) |
-| 2 | **Statistics 2.0** | `openbench rank`: many models ranked with uncertainty. `openbench plan`: sample-size and power planning. Calibrated equivalence for continuous scores. Variance components for repeated runs | [#20](https://github.com/lakshaychhaba0001-sys/openbench-ai/issues/20) |
-| 3 | **Judges you can measure** | LLM-as-judge with order swapping, length and self-preference checks, and agreement against human ratings before its scores are used | [#19](https://github.com/lakshaychhaba0001-sys/openbench-ai/issues/19) |
-| 4 | **Benchmarks you can trust** | Import standard benchmarks, semantic near-duplicate checks, contamination risk checks, generated dataset cards | [#21](https://github.com/lakshaychhaba0001-sys/openbench-ai/issues/21), [#9](https://github.com/lakshaychhaba0001-sys/openbench-ai/issues/9) |
-| 5 | **Results anyone can read** | Self-contained HTML reports and a read-only local dashboard (`openbench serve`) | [#18](https://github.com/lakshaychhaba0001-sys/openbench-ai/issues/18), [#4](https://github.com/lakshaychhaba0001-sys/openbench-ai/issues/4) |
-| 6 | **A platform others build on** | Plugins for metrics, adapters and datasets; Windows and macOS support; weekly real-model CI; cross-process cache locking; a documentation site | [#7](https://github.com/lakshaychhaba0001-sys/openbench-ai/issues/7), [#16](https://github.com/lakshaychhaba0001-sys/openbench-ai/issues/16), [#17](https://github.com/lakshaychhaba0001-sys/openbench-ai/issues/17), [#15](https://github.com/lakshaychhaba0001-sys/openbench-ai/issues/15) |
+| 1 | **Which model for my work?** | Bring a few of your own tasks and a list of candidate models, and get one report that recommends a model, with quality, tokens, cost, time and run-to-run noise side by side. When a few tasks cannot separate the models, the report says so and estimates how many more would | |
+| 2 | **Count the cost** | Tokens, cost and time in every comparison and on the dashboard; budget caps, sampling, and a dry run that shows the estimate before anything is spent | |
+| 3 | **Tasks without an answer key** | Open-ended tasks with no reference answer; a rubric judge; a local page for reviewing two answers blind; records that accept any of several answers | [#69](https://github.com/lakshaychhaba0001-sys/openbench-ai/issues/69), [#67](https://github.com/lakshaychhaba0001-sys/openbench-ai/issues/67), [#79](https://github.com/lakshaychhaba0001-sys/openbench-ai/issues/79), [#92](https://github.com/lakshaychhaba0001-sys/openbench-ai/issues/92) |
+| 4 | **Spend less to learn the same** | Small pilots that feed the sample-size planner; stopping early once the answer is clear; stored answers reused everywhere | |
+| 5 | **Compare more than models** | Prompts, settings and reasoning effort compared with the same statistics as models; multi-turn tasks | [#70](https://github.com/lakshaychhaba0001-sys/openbench-ai/issues/70) |
+| 6 | **Evaluation as a routine** | One suite file; a baseline check that fails CI when a model gets worse; trends over time; native Anthropic and Gemini adapters; import from the Hugging Face Hub; clustered intervals, Bradley–Terry ratings and ranking against a baseline; HTML for every report; a leaderboard page | [#71](https://github.com/lakshaychhaba0001-sys/openbench-ai/issues/71), [#72](https://github.com/lakshaychhaba0001-sys/openbench-ai/issues/72), [#73](https://github.com/lakshaychhaba0001-sys/openbench-ai/issues/73), [#89](https://github.com/lakshaychhaba0001-sys/openbench-ai/issues/89), [#90](https://github.com/lakshaychhaba0001-sys/openbench-ai/issues/90), [#91](https://github.com/lakshaychhaba0001-sys/openbench-ai/issues/91), [#93](https://github.com/lakshaychhaba0001-sys/openbench-ai/issues/93) |
+| 7 | **First five minutes** | The built-in datasets and examples shipped inside the package; setup and self-check commands | [#84](https://github.com/lakshaychhaba0001-sys/openbench-ai/issues/84), [#85](https://github.com/lakshaychhaba0001-sys/openbench-ai/issues/85), [#86](https://github.com/lakshaychhaba0001-sys/openbench-ai/issues/86), [#87](https://github.com/lakshaychhaba0001-sys/openbench-ai/issues/87), [#94](https://github.com/lakshaychhaba0001-sys/openbench-ai/issues/94) |
 
-Themes 1–3 are the core of the release. Themes 4–6 can move to v0.6.0 without blocking it.
+Themes 1–3 are the core of the release. Two items are conditional:
+
+- Stopping early ships only if its method passes a calibration study, like every statistical method in v0.5.0.
+- Agent and tool-use tasks follow the multi-turn design and may move to a later release.
 
 **Out of scope:**
 - a hosted service;
 - training or fine-tuning;
 - model serving;
+- a built-in price list;
 - any required dependency in the core install.
 
-Agent and multi-turn evaluation is planned for after v0.5.0.
+## Order of work
 
-## Milestones
+The stages run in order, and each one ends with something usable. There are no fixed dates.
 
-The milestones run in order, and each one ends in a gate and an installable pre-release on PyPI, so you can try features early. There are no fixed dates: work lands when it meets its gate.
-
-| Milestone | Main work | Gate |
+| Stage | Main work | Ends when |
 | --- | --- | --- |
-| **1. Foundations** | Plugin interface, OpenAI-compatible adapter, concurrency and costs, Windows/macOS CI, cache locking, real-model CI | **Alpha 1**: any supported model runs the full workflow end to end |
-| **2. Statistics and judges** | Multi-model ranking, sample-size planner, LLM judge with bias checks, judge–human agreement, variance components, continuous equivalence | **Alpha 2**: every new method passes its reference tests and calibration |
-| **3. Benchmarks and reports** | Benchmark import, semantic duplicates, contamination check, dataset cards, HTML reports, local dashboard | **Beta**: feature complete |
-| **4. Harden and release** | Independent review of the new statistics, documentation site, release candidate | **v0.5.0**: every release gate green on GitHub Actions |
+| **1. Cost foundations** | Pricing input, reasoning tokens, sampling, dry run, budget cap, cost columns in comparisons and rankings | A two-model comparison shows quality and cost with intervals |
+| **2. Open-ended tasks** | Tasks without a reference answer, rubric judge, blind review page, any-of references | A task set with no answer key can be scored three ways |
+| **3. Which model for my work?** | The guided workflow and its recommendation report | A person with three tasks and three models gets an honest recommendation |
+| **4. Smarter spending and variants** | Pilot-then-plan, early stopping, prompts and settings as named variants | A comparison stops early with a valid result |
+| **5. Routine for a lab** | Suite file, baseline check, trends, new adapters, Hub import, multi-turn tasks | A lab can run one command in CI |
+| **6. Harden and release** | Independent review of the new statistics, documentation, release candidate | Every release gate is green on GitHub Actions |
 
 ## Release gates
 
-v0.5.0 ships only when all of these pass on GitHub Actions:
+v0.6.0 ships only when all of these pass on GitHub Actions:
 
-- **No breaking changes:** v0.4.0 commands, public Python names, run directories, datasets and scores keep working.
+- **No breaking changes:** v0.5.0 commands, public Python names, run directories, datasets and scores keep working.
 - **Dependencies:** the core install stays dependency-free; new libraries live in optional extras.
 - **Checked statistics:** every new statistical method has reference tests, a committed calibration or coverage study, and a methodology section.
 - **Determinism:** analysis output is identical across Python 3.10–3.13 and across Linux, Windows and macOS.
-- **Security:** secrets are scrubbed everywhere, HTML output is escaped, the dashboard listens on localhost only, and plugins are documented as trusted code.
+- **Security:** secrets are scrubbed everywhere, HTML output is escaped, local pages listen on localhost only, and plugins are documented as trusted code.
 - **Real models:** the weekly real-model workflow has passed three times in a row.
-
-## Release gate status
-
-| Gate | Status |
-| --- | --- |
-| No breaking changes | All v0.4.0 tests pass unchanged except the three that pin the version number. |
-| Dependencies | The core install has no runtime dependencies; MkDocs is in the optional `docs` extra. |
-| Checked statistics | Reference tests and a committed calibration study for every new method ([methodology](docs/statistical_methodology.md), sections 18–22). One two-level CI cell missed its threshold and is reported with a documented follow-up. |
-| Determinism | CI runs the suite on Python 3.10–3.13 (Linux) and on Windows and macOS. |
-| Security | API keys stay in environment variables; HTML is escaped with a script-blocking CSP; the dashboard is read-only and local by default; plugins are documented as trusted code. |
-| Real models | The weekly real-model workflow is built and tested with the mock provider. It runs once the `OPENBENCH_REAL_MODEL_CI` repository variable is set; three passing runs are still to come. |
-
-## After v0.5.0
-
-No dates; work lands when it is ready.
-
-- **Agent and multi-turn evaluation**: tool-using and multi-step tasks, scored per step and per conversation.
-- **Real-model evidence**: switch on the weekly Ollama workflow and publish a worked tutorial with real models ([#15](https://github.com/lakshaychhaba0001-sys/openbench-ai/issues/15)).
-- **Documentation site**: publish it on GitHub Pages (the workflow is ready).
-- **Community datasets**: more categories, such as data extraction ([#9](https://github.com/lakshaychhaba0001-sys/openbench-ai/issues/9)).
-
-Ideas and requests are welcome in [Discussions](https://github.com/lakshaychhaba0001-sys/openbench-ai/discussions).
+- **Cost honesty:** every cost figure names its price source and says whether tokens were reported by the provider or estimated.
+- **Spending safety:** when prices are known, nothing calls a paid provider without showing the estimate first, and a budget cap is never exceeded.
 
 ## How to help
 
-Every theme has an entry point. Look for these labels:
+The core of the release (themes 1–4) is maintainer-led, because the design and the statistics need one owner. There is plenty around it:
 
-- [`good first issue`](https://github.com/lakshaychhaba0001-sys/openbench-ai/labels/good%20first%20issue): small, well-scoped tasks with pointers to the code.
+- [`good first issue`](https://github.com/lakshaychhaba0001-sys/openbench-ai/labels/good%20first%20issue): small, well-scoped tasks with pointers to the code. Comment on the issue to claim it before you start.
 - [`help wanted`](https://github.com/lakshaychhaba0001-sys/openbench-ai/labels/help%20wanted): larger features. Please comment with your plan before starting, so we can agree on the design.
+- The [v0.6.0 ideas discussion](https://github.com/lakshaychhaba0001-sys/openbench-ai/discussions/153): say which themes you would use and what is missing.
 
-Questions and ideas are welcome in [Discussions](https://github.com/lakshaychhaba0001-sys/openbench-ai/discussions). This roadmap is updated as milestones close; the pinned [v0.5.0 roadmap issue (#24)](https://github.com/lakshaychhaba0001-sys/openbench-ai/issues/24) tracks progress.
+Other questions and ideas are welcome in [Discussions](https://github.com/lakshaychhaba0001-sys/openbench-ai/discussions). This roadmap is updated as stages close.
+
+## Earlier releases
+
+v0.5.0 delivered all six of its themes: any model through one OpenAI-compatible adapter, ranking and sample-size planning, a measurable LLM judge, benchmark import and audits, HTML reports with a local dashboard, and plugins. The [changelog](CHANGELOG.md) has the details.

@@ -1,4 +1,4 @@
-# Advanced Evaluation Metrics Reference (v0.3.1)
+# Advanced Evaluation Metrics Reference
 
 OpenBench AI `v0.3.1` provides **13 registered metric identifiers** across baseline and advanced deterministic/embedding metrics.
 

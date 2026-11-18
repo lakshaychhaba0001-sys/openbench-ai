@@ -1,4 +1,4 @@
-# Benchmark Integrity & Provenance Verification (v0.3.0)
+# Benchmark Integrity & Provenance Verification
 
 OpenBench AI `v0.3.0` includes a cryptographic integrity and provenance verification system in `openbench.integrity.RunIntegrityVerifier`.
 

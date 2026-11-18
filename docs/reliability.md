@@ -1,4 +1,4 @@
-# Reliable Execution, Retries, Recovery & Caching (v0.3.0)
+# Reliable Execution, Retries, Recovery & Caching
 
 OpenBench AI `v0.3.0` is engineered for resilient execution across flaky local endpoints or long benchmark datasets.
 

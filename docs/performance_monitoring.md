@@ -1,4 +1,4 @@
-# Performance Monitoring & Token Accounting (v0.3.0)
+# Performance Monitoring & Token Accounting
 
 `PerformanceMonitor` (`openbench.performance`) captures execution timing, reliability counters, token usage, and optional cost estimates in `performance.json`.
 

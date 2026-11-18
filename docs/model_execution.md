@@ -1,4 +1,4 @@
-# Model Execution Engine (v0.3.0)
+# Model Execution Engine
 
 OpenBench AI `v0.3.0` introduces a provider-independent **Model Execution Engine** (`openbench.execution.ExecutionEngine`) that automates prompt dispatch, concurrency, retries, timeouts, deterministic caching, and telemetry collection while keeping evaluation completely decoupled.
 

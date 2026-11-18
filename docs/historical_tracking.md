@@ -1,4 +1,4 @@
-# Local Result History & Longitudinal Tracking (v0.2.0)
+# Local Result History & Longitudinal Tracking
 
 OpenBench AI `v0.2.0` includes a lightweight, zero-server evaluation history store (`openbench.history.ResultHistoryStore`) backed by an append-only JSONL file (`results/history.jsonl` by default).
 

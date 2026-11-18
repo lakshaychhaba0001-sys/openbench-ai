@@ -1,7 +1,7 @@
-# CLI reference (v0.4.0)
+# CLI reference
 
 Generated from the argument parser by `scripts/generate_reference_docs.py`; do not edit by hand.
-Flags marked *(v0.4.0)* are new; every v0.3.1 command, flag, default and choice is unchanged.
+Commands and flags marked *(v0.4.0)* were added in v0.4.0, and help text starting with `v0.5.0:` marks v0.5.0 additions. Every v0.3.1 command and flag is kept.
 
 ## `openbench validate-dataset`
 

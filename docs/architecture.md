@@ -62,3 +62,30 @@ Changes to existing modules:
 - `security.py`: `csv_safe`.
 - `cli.py`: thin handlers for `analyze`, `preferences` and the new flags.
 
+
+## v0.5.0 modules
+
+| Module | Responsibility |
+| --- | --- |
+| `openbench/adapters/openai_compatible.py` | Adapter for OpenAI-compatible chat completion servers (vLLM, LM Studio, llama.cpp server, hosted APIs). |
+| `openbench/plugins.py` | Discovery of third-party metrics, providers and dataset sources through entry points. |
+| `openbench/filelock.py` | Cross-process advisory file lock, used by the response cache. |
+| `openbench/stats/ranking.py`, `openbench/ranking.py` | Ranking several models with uncertainty (`openbench rank`). |
+| `openbench/stats/power.py` | Sample-size and power planning (`openbench plan`). |
+| `openbench/stats/components.py` | Variance components and the two-level confidence interval for repeated runs. |
+| `openbench/stats/bernstein.py` | Opt-in equivalence test for bounded continuous metrics (empirical Bernstein bounds). |
+| `openbench/judge.py` | Pairwise LLM-as-judge with order swapping and bias checks (`openbench judge`). |
+| `openbench/agreement.py` | Agreement between an automatic judgement and human preferences. |
+| `openbench/importers.py` | Import of local QA and multiple-choice files (`openbench import-dataset`). |
+| `openbench/contamination.py` | Read-only overlap audit against a reference corpus (`openbench audit-contamination`). |
+| `openbench/datacard.py` | Dataset cards (`openbench dataset-card`). |
+| `openbench/html_report.py` | Self-contained HTML reports. |
+| `openbench/serve.py` | Read-only local dashboard (`openbench serve`). |
+| `openbench/reporting_v050.py` | JSON, Markdown and CSV renderers for rankings, plans and judge results. |
+
+Changes to existing modules:
+
+- `execution.py`: request rate limiting across workers.
+- `quality.py`: optional semantic near-duplicate check.
+- `cache.py`: cross-process locking.
+- `cli.py`: thin handlers for the new commands.

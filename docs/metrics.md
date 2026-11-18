@@ -1,6 +1,6 @@
 # Metrics Reference & Limitations
 
-OpenBench AI `v0.1.0` provides three deterministic, reference-based metrics. Every metric inherits from `openbench.metrics.base.BaseMetric` and returns structured `MetricResult` and `AggregateMetricResult` objects.
+This page covers the three core deterministic, reference-based metrics, which date from `v0.1.0`. The others are in [Advanced metrics](advanced_metrics.md), and `openbench metrics list` prints every registered metric. Every metric inherits from `openbench.metrics.base.BaseMetric` and returns structured `MetricResult` and `AggregateMetricResult` objects.
 
 ---
 
