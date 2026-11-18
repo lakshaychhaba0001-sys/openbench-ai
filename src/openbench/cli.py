@@ -278,7 +278,7 @@ def build_parser() -> argparse.ArgumentParser:
     hist_list_parser.add_argument("--store", type=str, default=None)
     hist_list_parser.add_argument("--model", type=str, default=None)
     hist_list_parser.add_argument("--dataset", type=str, default=None)
-    hist_list_parser.add_argument("--format", choices=["text", "json"], default="text")
+    hist_list_parser.add_argument("--format", choices=["text", "json", "csv", "markdown"], default="text")
 
     hist_show_parser = history_subparsers.add_parser("show")
     hist_show_parser.add_argument("evaluation_id", type=str)
@@ -1155,6 +1155,31 @@ def _handle_dataset_stats(args: argparse.Namespace) -> int:
     return 0
 
 
+def _print_history_export(entries: list[Any], *, output_format: str) -> None:
+    metrics = sorted({metric for e in entries for metric in e.result_summary})
+    header = ["evaluation_id", "timestamp", "model", "model_version", "dataset", *metrics]
+    rows = [
+        [e.evaluation_id, e.timestamp, e.model_name, e.model_version, e.dataset_name]
+        + [
+            f"{e.result_summary[m]:.4f}" if m in e.result_summary else ""
+            for m in metrics
+        ]
+        for e in entries
+    ]
+    if output_format == "csv":
+        from openbench.security import csv_safe
+
+        writer = csv.writer(sys.stdout, lineterminator="\n")
+        writer.writerow([csv_safe(cell) for cell in header])
+        writer.writerows([csv_safe(cell) for cell in row] for row in rows)
+        return
+
+    print("| " + " | ".join(escape_markdown_cell(cell) for cell in header) + " |")
+    print("| " + " | ".join("---" for _ in header) + " |")
+    for row in rows:
+        print("| " + " | ".join(escape_markdown_cell(cell) for cell in row) + " |")
+
+
 def _handle_history(args: argparse.Namespace) -> int:
     if not args.history_action:
         print("Error: Specify a history action ('list' or 'show').", file=sys.stderr)
@@ -1165,6 +1190,9 @@ def _handle_history(args: argparse.Namespace) -> int:
         entries = store.list_entries(model_name=args.model, dataset_name=args.dataset)
         if args.format == "json":
             print(json.dumps([e.to_dict() for e in entries], indent=2))
+            return 0
+        if args.format in ("csv", "markdown"):
+            _print_history_export(entries, output_format=args.format)
             return 0
         if not entries:
             print("No historical evaluation runs found.")

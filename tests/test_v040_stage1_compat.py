@@ -54,7 +54,7 @@ def test_cli_surface_preserved() -> None:
         by_dest = {a["dest"]: a for a in current[path]}
         for action in actions:
             actual = by_dest.get(action["dest"])
-            if path == "runs list" and action["dest"] == "format":
+            if path in ("runs list", "history list") and action["dest"] == "format":
                 # New export formats may extend the historical choices.
                 assert actual is not None
                 assert set(action["choices"]) <= set(actual["choices"])

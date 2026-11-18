@@ -93,7 +93,7 @@ List or inspect local historical evaluation runs.
 | `--store` |  |  |  |  |
 | `--model` |  |  |  |  |
 | `--dataset` |  |  |  |  |
-| `--format` |  | `text` | `text`, `json` |  |
+| `--format` |  | `text` | `text`, `json`, `csv`, `markdown` |  |
 
 ## `openbench history show`
 
