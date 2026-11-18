@@ -75,7 +75,7 @@ class Dashboard:
 
         def link_line(label: str, key: str, values: list[str]) -> str:
             links = " · ".join(
-                f"<a href=\"{filter_url(**{key: v})}\">{esc(v)}</a>" for v in values
+                f"<a href=\"{esc(filter_url(**{key: v}))}\">{esc(v)}</a>" for v in values
             )
             return f"<p class=\"meta\">{label}: {links}</p>"
         rows = []
@@ -111,7 +111,7 @@ class Dashboard:
         if groups:
             body.append("<ul>"+"".join(
                 f"<li><a href=\"/groups/{esc(g)}\">{esc(g)}</a>"
-                f" (<a href=\"{filter_url(group=g)}\">show only this group's runs</a>)</li>"
+                f" (<a href=\"{esc(filter_url(group=g))}\">show only this group's runs</a>)</li>"
                 for g in groups
             ) + "</ul>")
         else:

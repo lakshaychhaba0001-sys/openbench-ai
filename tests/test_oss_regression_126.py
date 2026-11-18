@@ -144,7 +144,8 @@ def test_dashboard_filter_links(tmp_path, capsys):
         assert alpha[0].run_id not in followed
 
         body = get_page("?provider=mock")
-        assert 'href="/?status=completed&provider=mock"' in body
+        assert 'href="/?status=completed&amp;provider=mock"' in body
+        assert 'href="/?status=completed&provider=mock"' not in body
     finally:
         server.shutdown()
         server.server_close()
