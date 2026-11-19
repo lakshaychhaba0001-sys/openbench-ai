@@ -1,0 +1,46 @@
+name: Docker
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+    branches: ["main", "master"]
+
+permissions:
+  contents: read
+
+jobs:
+  docker:
+    name: Build and smoke-test Docker image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Build Docker image
+        run: docker build -t openbench .
+
+      - name: Verify non-root user and CLI version
+        run: |
+          test "$(docker run --rm --entrypoint id openbench -u)" != "0"
+          docker run --rm openbench --version
+
+      - name: Run mock-provider smoke test inside container
+        run: |
+          mkdir -p docker-smoke-out
+          docker run --rm \
+            --user "$(id -u):$(id -g)" \
+            -v "$PWD:/work" \
+            -w /work \
+            openbench run \
+            --dataset datasets/reasoning/sample.jsonl \
+            --provider mock \
+            --model docker-smoke \
+            --experiments-dir /work/docker-smoke-out \
+            --no-cache
+          docker run --rm \
+            --user "$(id -u):$(id -g)" \
+            -v "$PWD:/work" \
+            -w /work \
+            openbench runs list \
+            --experiments-dir /work/docker-smoke-out
