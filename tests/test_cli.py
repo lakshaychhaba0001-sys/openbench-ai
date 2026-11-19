@@ -305,3 +305,57 @@ def test_cli_serve_open_opens_dashboard(monkeypatch, capsys, host, browser_host)
     assert f"http://{printed_host}:8765/" in output
     if host in ("0.0.0.0", "::"):
         assert f"http://{browser_host}:8765/" in output
+
+
+def test_cli_runs_compare_format_csv(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    """`openbench runs compare --format csv` outputs valid CSV matching --output with .csv."""
+    repo_root = Path(__file__).resolve().parent.parent
+    dataset_path = repo_root / "datasets" / "reasoning" / "sample.jsonl"
+    exp_dir = tmp_path / "exp"
+
+    assert main([
+        "run",
+        "--dataset", str(dataset_path),
+        "--provider", "mock",
+        "--model", "mock-model-a",
+        "--experiments-dir", str(exp_dir),
+        "--no-cache",
+    ]) == 0
+
+    assert main([
+        "run",
+        "--dataset", str(dataset_path),
+        "--provider", "mock",
+        "--model", "mock-model-b",
+        "--experiments-dir", str(exp_dir),
+        "--no-cache",
+    ]) == 0
+
+    from openbench.experiments import ExperimentManager
+
+    manager = ExperimentManager(experiments_root=str(exp_dir))
+    runs = manager.list_runs()
+    assert len(runs) >= 2
+    run_a = runs[0].run_id
+    run_b = runs[1].run_id
+
+    csv_out = tmp_path / "comparison.csv"
+    assert main([
+        "runs", "compare", run_a, run_b,
+        "--experiments-dir", str(exp_dir),
+        "--output", str(csv_out),
+    ]) == 0
+
+    with open(csv_out, "r", encoding="utf-8", newline="") as f:
+        file_content = f.read()
+
+    capsys.readouterr()
+    assert main([
+        "runs", "compare", run_a, run_b,
+        "--experiments-dir", str(exp_dir),
+        "--format", "csv",
+    ]) == 0
+
+    captured = capsys.readouterr().out
+    assert captured == file_content
+

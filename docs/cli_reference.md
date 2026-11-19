@@ -210,7 +210,7 @@ Compare two or more experiment runs by their RUN_IDs.
 | `run_ids` | yes |  |  | Two or more experiment run IDs. |
 | `--experiments-dir` |  |  |  |  |
 | `--output` |  |  |  |  |
-| `--format` |  | `text` | `text`, `json`, `markdown` |  |
+| `--format` |  | `text` | `text`, `json`, `markdown`, `csv` |  |
 
 ## `openbench rank`
 
