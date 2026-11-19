@@ -42,9 +42,9 @@ birch_id=$(printf '%s\n' "$birch_output" | sed -n "s/^Run '\([^']*\)'.*/\1/p")
 Observed run summaries (the generated IDs vary):
 
 ```text
-Run 'run_eab50ea1e029' [completed]: 6/6 completed (provider=mock, model=cedar, scores={'exact_match': 1.0})
-Run 'run_887e9ab256f9' [completed]: 6/6 completed (provider=mock, model=maple, scores={'exact_match': 1.0})
-Run 'run_b951c6a56c2f' [completed]: 6/6 completed (provider=mock, model=birch, scores={'exact_match': 1.0})
+Run 'run_e1e81697bfed' [completed]: 6/6 completed (provider=mock, model=cedar, scores={'exact_match': 1.0}) -> experiments/run_e1e81697bfed
+Run 'run_379c411ea7e2' [completed]: 6/6 completed (provider=mock, model=maple, scores={'exact_match': 1.0}) -> experiments/run_379c411ea7e2
+Run 'run_25c0408aaef3' [completed]: 6/6 completed (provider=mock, model=birch, scores={'exact_match': 1.0}) -> experiments/run_25c0408aaef3
 ```
 
 ## Rank in Markdown and HTML
@@ -62,12 +62,12 @@ the HTML command reported `Ranking (html) written to: ranking.html`. The
 observed Markdown table was:
 
 | Rank | Rank interval | Model | Mean | 95% CI | Tied with top | p(best), bootstrap |
-|---:|:---:|---|---:|:---:|:---:|---:|
-| 2.0 | 1-3 | run_887e9ab256f9 | 1.0000 | [1.0000, 1.0000] | yes | 0.333 |
-| 2.0 | 1-3 | run_b951c6a56c2f | 1.0000 | [1.0000, 1.0000] | yes | 0.333 |
-| 2.0 | 1-3 | run_eab50ea1e029 | 1.0000 | [1.0000, 1.0000] | yes | 0.333 |
+|---|---|---|---|---|---|---|
+| 2.0 | 1-3 | run_25c0408aaef3 | 1.0000 | [1.0000, 1.0000] | yes | 0.333 |
+| 2.0 | 1-3 | run_379c411ea7e2 | 1.0000 | [1.0000, 1.0000] | yes | 0.333 |
+| 2.0 | 1-3 | run_e1e81697bfed | 1.0000 | [1.0000, 1.0000] | yes | 0.333 |
 
-In that captured report, the first ID is the maple run, the second is birch,
+In that captured report, the first ID is the birch run, the second is maple,
 and the third is cedar; generated IDs vary. Each `1-3`
 rank interval means the data do not rule out any of the three positions.
 “Tied with top” means the paired tests did not distinguish that run from
@@ -96,16 +96,29 @@ Observed output:
 ```text
 # OpenBench AI sample-size plan
 
-337 paired items are needed to detect a difference of 0.0500 with 0.80 power at alpha = 0.05.
+**337 paired items** are needed to detect a difference of 0.0500 with 0.80 power at alpha = 0.05.
 
 | Field | Value |
+|---|---|
+| metric_kind | binary |
+| test | mcnemar_exact |
+| difference | 0.0500 |
+| p01 | 0.0750 |
+| p10 | 0.0250 |
+| discordance | 0.1000 |
+| assumption | discordance rate given |
+| alpha | 0.0500 |
+| target_power | 0.8000 |
 | items_needed | 337 |
 | power_at_items_needed | 0.8007 |
 | method | exact |
 | provider_calls | 0 |
 
 Assumption: discordance rate given.
+
 Plans are approximate: they assume the items you will use behave like the inputs given here.
+
+[Reading guide](https://lakshaychhaba0001-sys.github.io/openbench-ai/reading_a_report/) · [Glossary](https://lakshaychhaba0001-sys.github.io/openbench-ai/glossary/)
 ```
 
 The planner uses the discordance assumption to calculate the paired sample
