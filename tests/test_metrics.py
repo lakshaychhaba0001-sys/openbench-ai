@@ -11,9 +11,12 @@ from openbench.metrics import (
     BaseMetric,
     ExactMatchMetric,
     KeywordCoverageMetric,
+    METRIC_REGISTRY,
     MetricResult,
     NormalizationConfig,
+    RegexMatchMetric,
     create_metric,
+    list_registered_metrics,
     normalize_text,
     register_metric,
 )
@@ -169,4 +172,40 @@ def test_custom_metric_registration_and_lookup() -> None:
     assert inst.compute_item(rec, "42").passed is True
 
     with pytest.raises(MetricError, match="Unknown metric"):
-        create_metric("non_existent_metric_xyz")
+        create_metric("non_existent_metric_xyz"
+
+
+def test_regex_match_search_default() -> None:
+    metric = RegexMatchMetric()
+    record = _make_record("42", answer_pattern=r"\b42\b")
+    assert metric.compute_item(record, "The answer is 42.").score == 1.0
+    assert metric.compute_item(record, "The answer is 43.").score == 0.0
+
+
+def test_regex_match_fullmatch() -> None:
+    metric = RegexMatchMetric(fullmatch=True)
+    record = _make_record("42", answer_pattern=r"\d+")
+    assert metric.compute_item(record, "42").score == 1.0
+    assert metric.compute_item(record, "The answer is 42").score == 0.0
+
+
+def test_regex_match_fallback_to_exact_match() -> None:
+    metric = RegexMatchMetric()
+    record = _make_record("Paris")
+    result = metric.compute_item(record, "  paris ")
+    assert result.score == 1.0
+    assert result.details["fallback"] == "exact_match"
+
+
+def test_regex_match_invalid_pattern_raises() -> None:
+    metric = RegexMatchMetric()
+    record = _make_record("42", answer_pattern="[unclosed")
+    with pytest.raises(ValueError, match=record.id):
+        metric.compute_item(record, "42")
+
+
+def test_regex_match_registry_lookup() -> None:
+    assert "regex_match" in METRIC_REGISTRY
+    assert "regex_match" in list_registered_metrics()
+    assert isinstance(create_metric("regex_match"), RegexMatchMetric)
+    )

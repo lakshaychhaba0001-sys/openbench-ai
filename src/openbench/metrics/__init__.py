@@ -20,6 +20,7 @@ from openbench.metrics.keyword_match import KeywordCoverageMetric
 from openbench.metrics.normalization import NormalizationConfig, normalize_text
 from openbench.metrics.precision import PrecisionMetric
 from openbench.metrics.recall import RecallMetric
+from openbench.metrics.regex_match import RegexMatchMetric
 from openbench.metrics.rouge import Rouge1Metric, RougeLMetric, RougeMetric
 from openbench.metrics.semantic_similarity import (
     CallableEmbeddingProvider,
@@ -49,6 +50,7 @@ METRIC_REGISTRY: dict[str, type[BaseMetric]] = {
     SemanticSimilarityMetric.name: SemanticSimilarityMetric,
     LexicalSimilarityMetric.name: LexicalSimilarityMetric,
     StructuredOutputMetric.name: StructuredOutputMetric,
+    RegexMatchMetric.name: RegexMatchMetric,
 }
 
 
@@ -121,6 +123,7 @@ __all__ = [
     "NormalizationConfig",
     "PrecisionMetric",
     "RecallMetric",
+    "RegexMatchMetric",
     "Rouge1Metric",
     "RougeLMetric",
     "RougeMetric",

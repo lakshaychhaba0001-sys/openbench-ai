@@ -67,3 +67,18 @@ Evaluates the fraction of expected keywords present in the normalized model resp
 ### Explicit Methodological Warning
 > **Keyword coverage is NOT equivalent to semantic correctness.**
 > A model response can include 100% of the target keywords while stating the exact opposite of the intended meaning or using the terms in an unsafe context. Always inspect `exact_match`, `accuracy`, and individual item outputs alongside `keyword_coverage`.
+---
+
+## 4. Regex Match (`regex_match`)
+
+### Definition
+Evaluates whether the model response matches a regular expression pattern specified on the item:
+
+- Reads the regex pattern from `item.metadata["answer_pattern"]`.
+- By default uses `re.search` to check whether the pattern matches anywhere in the response; set `fullmatch=True` to require `re.fullmatch`.
+- Scores `1.0` (`passed=True`) if the pattern matches, and `0.0` (`passed=False`) otherwise.
+- Compiled patterns are cached and reused; invalid regex patterns raise a `ValueError` naming the item ID.
+- If `metadata.answer_pattern` is absent or empty, `regex_match` falls back to `exact_match` and records `"fallback": "exact_match"` in the result `details`.
+
+### When to Use
+- Tasks with structured or semi-structured outputs (e.g., extracted numbers, dates, IDs, or formatted answers) where multiple valid surface forms match a pattern.
