@@ -80,7 +80,7 @@ Display detailed statistics for a dataset file or directory.
 | `dataset_path` | yes |  |  |  |
 | `--category` |  |  |  |  |
 | `--difficulty` |  |  |  |  |
-| `--format` |  | `text` | `text`, `json` |  |
+| `--format` |  | `text` | `text`, `json`, `markdown` |  |
 
 ## `openbench history`
 

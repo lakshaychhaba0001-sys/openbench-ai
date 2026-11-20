@@ -273,7 +273,7 @@ def build_parser() -> argparse.ArgumentParser:
     stats_ds_parser.add_argument("dataset_path", type=str)
     stats_ds_parser.add_argument("--category", type=str, default=None)
     stats_ds_parser.add_argument("--difficulty", type=str, default=None)
-    stats_ds_parser.add_argument("--format", choices=["text", "json"], default="text")
+    stats_ds_parser.add_argument("--format", choices=["text", "json", "markdown"], default="text")
 
     # 7. history (v0.2.0 preserved)
     history_parser = subparsers.add_parser(
@@ -1193,6 +1193,32 @@ def _handle_inspect_dataset(args: argparse.Namespace) -> int:
             print(f"    * [{sample['id']}] ({sample['category']}): {sample['prompt']}")
     return 0
 
+def _print_dataset_stats_markdown(stats: dict[str, Any]) -> None:
+    print(f"# Dataset Statistics: {escape_markdown_cell(stats['name'])} "
+          f"(v{escape_markdown_cell(stats['version'])})")
+    print()
+    print(f"- Files Count: {stats['files_count']}")
+    print(f"- Total Records: {stats['total_records']}")
+    print(f"- SHA-256 Checksum: {escape_markdown_cell(stats['checksum'])}")
+    print()
+    for title, singular, key in (("Categories", "Category", "categories"),
+                                 ("Difficulties", "Difficulty", "difficulties"),
+                                 ("Languages", "Language", "languages")):
+        print(f"## {title}")
+        print()
+        print(f"| {singular} | Records |")
+        print("| --- | --- |")
+        for name, count in sorted(stats[key].items()):
+            print(f"| {escape_markdown_cell(name)} | {count} |")
+        print()
+    print("## Lengths (characters)")
+    print()
+    print("| Field | Min | Max | Avg |")
+    print("| --- | --- | --- | --- |")
+    prompt = stats["prompt_char_length"]
+    answer = stats["expected_answer_char_length"]
+    print(f"| Prompt | {prompt['min']} | {prompt['max']} | {prompt['avg']} |")
+    print(f"| Answer | {answer['min']} | {answer['max']} | {answer['avg']} |")
 
 def _handle_dataset_stats(args: argparse.Namespace) -> int:
     stats = DatasetCatalog.compute_stats(
@@ -1202,6 +1228,9 @@ def _handle_dataset_stats(args: argparse.Namespace) -> int:
     )
     if args.format == "json":
         print(json.dumps(stats, indent=2))
+        return 0
+    if args.format == "markdown":
+        _print_dataset_stats_markdown(stats)
         return 0
 
     print(f"Dataset Statistics: {stats['name']} (v{stats['version']})")
