@@ -14,8 +14,9 @@ __pycache__
 .mypy_cache
 .coverage
 htmlcov
-runs
+experiments
 results
+.openbench_cache
 site
 .DS_Store
 *.log
