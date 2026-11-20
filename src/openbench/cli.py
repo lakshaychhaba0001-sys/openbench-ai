@@ -589,7 +589,10 @@ def build_parser() -> argparse.ArgumentParser:
     judge_parser.add_argument("--seed", type=int, default=0)
     judge_parser.add_argument("--resamples", type=int, default=10_000)
     judge_parser.add_argument("--output", type=str, default=None)
-    judge_parser.add_argument("--format", choices=["json", "markdown", "csv"], default="markdown")
+    judge_parser.add_argument(
+        "--format", choices=["json", "markdown", "csv"], default=None,
+        help="Judge report format. Defaults to Markdown unless --output ends in .json or .csv.",
+    )
 
     # v0.5.0: benchmarks and reports
     imp_parser = subparsers.add_parser(
@@ -629,7 +632,10 @@ def build_parser() -> argparse.ArgumentParser:
     cont_parser.add_argument("--threshold", type=float, default=0.5)
     cont_parser.add_argument("--min-words", type=int, default=8)
     cont_parser.add_argument("--output", type=str, default=None)
-    cont_parser.add_argument("--format", choices=["json", "markdown", "csv"], default="markdown")
+    cont_parser.add_argument(
+        "--format", choices=["json", "markdown", "csv"], default=None,
+        help="Audit report format. Defaults to Markdown unless --output ends in .json or .csv.",
+    )
 
     card_parser = subparsers.add_parser(
         "dataset-card",
@@ -2485,7 +2491,11 @@ def _handle_judge(args: argparse.Namespace) -> int:
             human, automatic, categories={t["record_id"]: t["category"] for t in result["tasks"]},
             automatic_name=f"judge:{args.judge_model}", analysis_seed=args.seed, resamples=args.resamples,
         )
-    _write_or_print(render_judge(redact_sensitive_data(result), args.format), args.output, f"Judge report ({args.format})")
+    output_format = args.format or _format_from_output_extension(
+        args.output, ("markdown", "json", "csv"),
+    )
+    text = render_judge(redact_sensitive_data(result), output_format)
+    _write_or_print(text, args.output, f"Judge report ({output_format})")
     for w in result["warnings"]:
         print(f"Warning [{w['code']}]: {w['message']}", file=sys.stderr)
     return 0
@@ -2528,7 +2538,11 @@ def _handle_audit_contamination(args: argparse.Namespace) -> int:
 
     dataset = DatasetLoader.load(args.dataset_path)
     payload = audit_contamination(dataset, args.corpus, ngram=args.ngram, threshold=args.threshold, min_words=args.min_words)
-    _write_or_print(render_contamination(payload, args.format), args.output, f"Contamination audit ({args.format})")
+    output_format = args.format or _format_from_output_extension(
+        args.output, ("markdown", "json", "csv"),
+    )
+    text = render_contamination(payload, output_format)
+    _write_or_print(text, args.output, f"Contamination audit ({output_format})")
     s = payload["summary"]
     print(f"{s['records_flagged']} of {len(payload['records'])} record(s) flagged (overlap >= {args.threshold}). "
           "A low overlap does not prove the dataset is clean.", file=sys.stderr)

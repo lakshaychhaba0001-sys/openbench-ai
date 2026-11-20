@@ -278,7 +278,7 @@ v0.5.0: pairwise LLM-as-judge with order swapping and bias checks.
 | `--seed` |  | `0` |  |  |
 | `--resamples` |  | `10000` |  |  |
 | `--output` |  |  |  |  |
-| `--format` |  | `markdown` | `json`, `markdown`, `csv` |  |
+| `--format` |  |  | `json`, `markdown`, `csv` | Judge report format. Defaults to Markdown unless --output ends in .json or .csv. |
 
 ## `openbench import-dataset`
 
@@ -311,7 +311,7 @@ v0.5.0: read-only check of word n-gram overlap between a dataset and a reference
 | `--threshold` |  | `0.5` |  |  |
 | `--min-words` |  | `8` |  |  |
 | `--output` |  |  |  |  |
-| `--format` |  | `markdown` | `json`, `markdown`, `csv` |  |
+| `--format` |  |  | `json`, `markdown`, `csv` | Audit report format. Defaults to Markdown unless --output ends in .json or .csv. |
 
 ## `openbench dataset-card`
 

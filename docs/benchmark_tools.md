@@ -33,8 +33,11 @@ see training data, but it can check a dataset against text you supply: a public 
 forum dump, or your own fine-tuning data.
 
 ```bash
-openbench audit-contamination datasets/reasoning/sample.jsonl --corpus my_finetune_data/ --format markdown
+openbench audit-contamination datasets/reasoning/sample.jsonl --corpus my_finetune_data/ --output contamination.json
 ```
+
+Unless you pass `--format`, the audit writes JSON for `.json`, CSV for `.csv`, and Markdown for
+other filenames or terminal output.
 
 - Text is normalised (case, punctuation, whitespace) and split into words. The check uses word
   n-grams, 13 by default (`--ngram`), the length common in contamination studies.

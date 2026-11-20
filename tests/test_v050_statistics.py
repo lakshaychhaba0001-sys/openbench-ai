@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import csv
 import json
 import math
 import random
@@ -567,6 +568,42 @@ def test_judge_self_preference_and_unparsed():
     codes = {w["code"] for w in out["warnings"]}
     assert {"self_preference_risk", "unparsed_verdicts"} <= codes
     assert out["win_rate_a"] is None
+
+
+@pytest.mark.parametrize(
+    ("filename", "format_args", "expected"),
+    [
+        ("judge.json", [], "json"),
+        ("judge.csv", [], "csv"),
+        ("judge.csv", ["--format", "json"], "json"),
+        ("judge.txt", [], "markdown"),
+        (None, [], "markdown"),
+    ],
+)
+def test_cli_judge_output_format(tmp_path, capsys, monkeypatch, filename, format_args, expected):
+    dataset = write_dataset(tmp_path / "dataset.jsonl", 1)
+    a = evaluate(dataset, correct_answers(1), "model-a", tmp_path / "a.json")
+    b = evaluate(dataset, correct_answers(1, wrong=(1,)), "model-b", tmp_path / "b.json")
+    adapter = LocalCallableAdapter("offline", lambda prompt: "tie")
+    monkeypatch.setattr("openbench.cli.create_provider", lambda *args, **kwargs: adapter)
+    args = [
+        "judge", "--results", str(a), str(b), "--judge-provider", "local_callable",
+        "--judge-model", "offline", "--no-cache", "--resamples", "200", *format_args,
+    ]
+    if filename is None:
+        assert main(args) == 0
+        text = capsys.readouterr().out
+    else:
+        output = tmp_path / filename
+        assert main([*args, "--output", str(output)]) == 0
+        assert capsys.readouterr().out == f"Judge report ({expected}) written to: {output}\n"
+        text = output.read_text(encoding="utf-8")
+    if expected == "json":
+        assert json.loads(text)["tasks"][0]["verdict"] == "tie"
+    elif expected == "csv":
+        assert next(csv.DictReader(text.splitlines()))["verdict"] == "tie"
+    else:
+        assert text.startswith("# OpenBench AI LLM-judge report\n")
 
 
 class _JudgeServer(BaseHTTPRequestHandler):

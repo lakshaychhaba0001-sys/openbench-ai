@@ -6,13 +6,16 @@ biased the judge is, and how well it agrees with people when you have human anno
 
 ```bash
 openbench judge --runs run_<a> run_<b> \
-  --judge-provider ollama --judge-model qwen2.5:7b --format markdown --output judge.md
+  --judge-provider ollama --judge-model qwen2.5:7b --output judge.md
 
 # Any OpenAI-compatible judge, with agreement against blinded human annotations
 openbench judge --runs run_<a> run_<b> \
   --judge-provider openai_compatible --judge-endpoint http://localhost:8000/v1 --judge-model judge \
   --key prefs/tasks.key.json --annotations annotations.jsonl
 ```
+
+Unless you pass `--format`, the judge writes JSON for `.json`, CSV for `.csv`, and Markdown for
+other filenames or terminal output.
 
 ## What it does
 

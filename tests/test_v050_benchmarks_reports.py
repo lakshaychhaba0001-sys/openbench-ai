@@ -3,6 +3,7 @@ dataset cards, HTML reports and the read-only dashboard."""
 
 from __future__ import annotations
 
+import csv
 import json
 import urllib.error
 import urllib.request
@@ -146,6 +147,35 @@ def test_cli_audit_contamination_formats(tmp_path, capsys):
         assert "reasoning_001" in out
     with pytest.raises(FileNotFoundError):
         audit_contamination(DatasetLoader.load(ds), tmp_path / "missing")
+
+
+@pytest.mark.parametrize(
+    ("filename", "format_args", "expected"),
+    [
+        ("audit.json", [], "json"),
+        ("audit.csv", [], "csv"),
+        ("audit.json", ["--format", "csv"], "csv"),
+        ("audit.txt", [], "markdown"),
+        (None, [], "markdown"),
+    ],
+)
+def test_cli_contamination_output_format(tmp_path, capsys, filename, format_args, expected):
+    dataset = write_dataset(tmp_path / "dataset.jsonl", 1)
+    args = ["audit-contamination", str(dataset), "--corpus", str(dataset), *format_args]
+    if filename is None:
+        assert main(args) == 0
+        text = capsys.readouterr().out
+    else:
+        output = tmp_path / filename
+        assert main([*args, "--output", str(output)]) == 0
+        assert capsys.readouterr().out == f"Contamination audit ({expected}) written to: {output}\n"
+        text = output.read_text(encoding="utf-8")
+    if expected == "json":
+        assert json.loads(text)["records"][0]["id"] == "item_001"
+    elif expected == "csv":
+        assert next(csv.DictReader(text.splitlines()))["id"] == "item_001"
+    else:
+        assert text.startswith("# OpenBench AI contamination risk audit\n")
 
 
 # ---------------------------------------------------------------------------------------------
