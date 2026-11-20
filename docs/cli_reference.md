@@ -190,7 +190,7 @@ Verify cryptographic SHA-256 artifact checksums and provenance of a run.
 | `--experiments-dir` |  |  |  |  |
 | `--format` |  | `text` | `text`, `json` |  |
 | `--quality-checks` |  |  |  | *(v0.4.0)* also run the experiment quality audit (EQ checks). |
-| `--audit-output` |  |  |  | *(v0.4.0)* write the audit report (JSON) here. |
+| `--audit-output` |  |  |  | *(v0.4.0)* with --quality-checks, write the audit report here (.md/.markdown: Markdown, .csv: CSV, otherwise JSON). |
 
 ## `openbench runs resume`
 

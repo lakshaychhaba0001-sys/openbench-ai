@@ -484,7 +484,7 @@ def build_parser() -> argparse.ArgumentParser:
     runs_verify_p.add_argument(
         "--quality-checks", action="store_true", help="v0.4.0: also run the experiment quality audit (EQ checks)."
     )
-    runs_verify_p.add_argument("--audit-output", type=str, default=None, help="v0.4.0: write the audit report (JSON) here.")
+    runs_verify_p.add_argument("--audit-output", type=str, default=None, help="v0.4.0: with --quality-checks, write the audit report here (.md/.markdown: Markdown, .csv: CSV, otherwise JSON).")
 
     runs_resume_p = runs_subparsers.add_parser(
         "resume",
@@ -1760,6 +1760,7 @@ def _handle_runs(args: argparse.Namespace) -> int:
             return 1
         if getattr(args, "quality_checks", False):
             return _verify_with_audit(args, manager, check.to_dict(), check.valid)
+        _note_audit_output_ignored(args)
         if args.format == "json":
             print(json.dumps(check.to_dict(), indent=2))
             return 0 if check.valid else 1
@@ -1894,6 +1895,7 @@ def _handle_group_action(args: argparse.Namespace, manager: ExperimentManager) -
         result = manager.verify_group(group_id)
         if getattr(args, "quality_checks", False):
             return _verify_with_audit(args, manager, result, result["valid"], group=True)
+        _note_audit_output_ignored(args)
         if args.format == "json":
             print(json.dumps(result, indent=2))
             return 0 if result["valid"] else 1
@@ -1928,6 +1930,14 @@ def _handle_group_action(args: argparse.Namespace, manager: ExperimentManager) -
     return 0 if result.is_complete else 1
 
 
+def _note_audit_output_ignored(args: argparse.Namespace) -> None:
+    if getattr(args, "audit_output", None):
+        print(
+            "Note: --audit-output only applies with --quality-checks; no audit was written.",
+            file=sys.stderr,
+        )
+
+
 def _verify_with_audit(args: argparse.Namespace, manager: ExperimentManager, check: dict[str, Any], valid: bool, group: bool = False) -> int:
     """`runs verify ... --quality-checks` (v0.4.0): integrity plus EQ audit; read-only."""
     from openbench.quality import ExperimentAuditor
@@ -1943,9 +1953,13 @@ def _verify_with_audit(args: argparse.Namespace, manager: ExperimentManager, che
         print(f"Integrity [{args.run_id}]: {'VALID' if valid else 'INVALID'}")
         _print_audit_summary(payload, args.run_id)
     if args.audit_output:
+        audit_format = _format_from_output_extension(
+            args.audit_output, ("json", "markdown", "csv"), default="json",
+        )
         out = validate_safe_output_path(args.audit_output)
         out.parent.mkdir(parents=True, exist_ok=True)
-        out.write_text(render_audit(payload, "json"), encoding="utf-8")
+        out.write_text(render_audit(payload, audit_format), encoding="utf-8")
+        print(f"Audit report ({audit_format}) written to: {out}")
     return 0 if valid and report.exit_code == 0 else 1
 
 
