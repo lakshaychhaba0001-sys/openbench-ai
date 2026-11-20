@@ -118,7 +118,7 @@ Because `host.docker.internal` is a non-loopback hostname, OpenBench's endpoint 
 provider:
   name: ollama
   model: llama3.2
-  endpoint: [http://host.docker.internal:11434](http://host.docker.internal:11434)
+  endpoint: http://host.docker.internal:11434
   allow_remote_http: true
 ```
 
