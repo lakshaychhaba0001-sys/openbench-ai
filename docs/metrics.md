@@ -12,6 +12,8 @@ Before comparing model outputs against reference answers, text is normalized usi
 - `case_sensitive` (`False` by default): Converts text to lowercase unless set to `True`.
 - `collapse_whitespace` (`True` by default): Replaces consecutive spaces, tabs, and newlines with a single space.
 - `strip_punctuation` (`False` by default): Punctuation is **preserved by default** so significant symbols in code (`[1, 9]`, `__repr__`), fractions (`1/2`), or JSON are never silently stripped.
+- `unicode_normalization` (`None` by default): Optional Unicode normalization form (`"NFC"` or `"NFKC"`) applied before other normalization steps.
+- `strip_unicode_punctuation` (`False` by default): When `True` alongside `strip_punctuation=True`, also strips Unicode punctuation characters (category `P*`).
 
 ---
 
