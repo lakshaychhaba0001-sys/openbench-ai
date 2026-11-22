@@ -397,11 +397,13 @@ Clear all cached responses.
 
 ## `openbench cache prune`
 
-Remove cached responses older than a number of days.
+Remove cached responses matching an age, provider, and/or model filter.
 
 | Argument | Required | Default | Choices | Help |
 | :--- | :---: | :--- | :--- | :--- |
-| `--older-than` | yes |  |  | Remove entries cached more than DAYS days ago (a positive integer). |
+| `--older-than` |  |  |  | Remove entries cached more than DAYS days ago (a positive integer). |
+| `--provider` |  |  |  | Remove entries belonging to provider NAME. |
+| `--model` |  |  |  | Remove entries belonging to model NAME. |
 | `--dry-run` |  |  |  | Only report what would be removed. |
 | `--cache-dir` |  |  |  |  |
 
