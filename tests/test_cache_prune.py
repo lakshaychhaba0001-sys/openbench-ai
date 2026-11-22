@@ -168,3 +168,174 @@ def test_cli_cache_prune_reports_a_corrupted_cache(tmp_path, capsys):
     _write(tmp_path, [], raw_lines=("{broken",))
     assert main(["cache", "prune", "--older-than", "30", "--cache-dir", str(tmp_path)]) == 1
     assert "Corrupted cache file" in capsys.readouterr().err
+
+def _entry_for(
+    key: str,
+    cached_at: str | None,
+    *,
+    provider: str = "p",
+    model: str = "m",
+    response: str = "x",
+) -> dict:
+    data = CacheRecord(
+        cache_key=key,
+        provider_name=provider,
+        model_name=model,
+        model_version="1",
+        dataset_name="d",
+        dataset_version="1",
+        record_id=key,
+        prompt_sha256="a" * 64,
+        generation_config_sha256="b" * 64,
+        response=response,
+        latency_ms=None,
+        token_usage=None,
+        cached_at=cached_at or "",
+    ).to_dict()
+    if cached_at is None:
+        del data["cached_at"]
+    return data
+
+
+def test_prune_by_model_only(tmp_path):
+    path = _write(tmp_path, [
+        _entry_for("a1", "2026-06-29T12:00:00+00:00", provider="openai", model="gpt-a"),
+        _entry_for("a2", "2026-01-01T12:00:00+00:00", provider="azure", model="gpt-a"),
+        _entry_for("b1", "2026-01-01T12:00:00+00:00", provider="openai", model="gpt-b"),
+    ])
+    cache = ResponseCache(tmp_path)
+    result = cache.prune(model="gpt-a")
+    assert result == PruneResult(removed=2, kept=1, unknown_age=0)
+    assert _keys(path) == ["b1"]
+    assert cache.stats()["stored_entries"] == 1
+
+
+def test_prune_by_provider_only(tmp_path):
+    path = _write(tmp_path, [
+        _entry_for("o1", "2026-06-29T12:00:00+00:00", provider="openai", model="gpt-a"),
+        _entry_for("o2", "2026-06-28T12:00:00+00:00", provider="openai", model="gpt-b"),
+        _entry_for("l1", "2026-01-01T12:00:00+00:00", provider="ollama", model="llama3.2"),
+    ])
+    cache = ResponseCache(tmp_path)
+    result = cache.prune(provider="openai")
+    assert result == PruneResult(removed=2, kept=1, unknown_age=0)
+    assert _keys(path) == ["l1"]
+
+
+def test_prune_by_model_and_age_uses_and_semantics(tmp_path):
+    path = _write(tmp_path, [
+        _entry_for("a-old", "2026-05-01T12:00:00+00:00", provider="openai", model="gpt-a"),
+        _entry_for("a-new", "2026-06-25T12:00:00+00:00", provider="openai", model="gpt-a"),
+        _entry_for("b-old", "2026-05-01T12:00:00+00:00", provider="openai", model="gpt-b"),
+    ])
+    result = ResponseCache(tmp_path).prune(30, now=NOW, model="gpt-a")
+    assert result == PruneResult(removed=1, kept=2, unknown_age=0)
+    assert _keys(path) == ["a-new", "b-old"]
+
+
+def test_prune_by_provider_and_model_uses_and_semantics(tmp_path):
+    path = _write(tmp_path, [
+        _entry_for("openai-a", "2026-06-25T12:00:00+00:00", provider="openai", model="gpt-a"),
+        _entry_for("azure-a", "2026-06-25T12:00:00+00:00", provider="azure", model="gpt-a"),
+        _entry_for("openai-b", "2026-06-25T12:00:00+00:00", provider="openai", model="gpt-b"),
+    ])
+    result = ResponseCache(tmp_path).prune(provider="openai", model="gpt-a")
+    assert result == PruneResult(removed=1, kept=2, unknown_age=0)
+    assert _keys(path) == ["azure-a", "openai-b"]
+
+
+def test_prune_unreadable_cached_at_with_and_without_age_filter(tmp_path):
+    path = _write(tmp_path, [
+        _entry_for("a-old", "2026-01-01T00:00:00+00:00", provider="openai", model="gpt-a"),
+        _entry_for("a-bad", "not-a-date", provider="openai", model="gpt-a"),
+        _entry_for("b-bad", None, provider="openai", model="gpt-b"),
+    ])
+    cache = ResponseCache(tmp_path)
+    # With age + model filter: unreadable cached_at for gpt-a is kept as unknown_age.
+    with_age = cache.prune(30, now=NOW, model="gpt-a")
+    assert with_age == PruneResult(removed=1, kept=1, unknown_age=1)
+    assert _keys(path) == ["a-bad", "b-bad"]
+
+    # With model filter only: age does not matter, so unreadable gpt-a is removed.
+    without_age = cache.prune(model="gpt-a")
+    assert without_age == PruneResult(removed=1, kept=1, unknown_age=0)
+    assert _keys(path) == ["b-bad"]
+
+
+def test_prune_model_dry_run_changes_nothing(tmp_path):
+    path = _write(tmp_path, [
+        _entry_for("a1", "2026-06-25T12:00:00+00:00", provider="openai", model="gpt-a"),
+        _entry_for("b1", "2026-06-25T12:00:00+00:00", provider="openai", model="gpt-b"),
+    ])
+    before = path.read_bytes()
+    result = ResponseCache(tmp_path).prune(model="gpt-a", dry_run=True)
+    assert result == PruneResult(removed=1, kept=1, unknown_age=0, dry_run=True)
+    assert path.read_bytes() == before
+
+
+def test_prune_requires_at_least_one_filter(tmp_path):
+    with pytest.raises(OpenBenchError, match="at least one filter"):
+        ResponseCache(tmp_path).prune()
+
+
+def test_prune_existing_positional_calls_behave_as_before(tmp_path):
+    path = _write(tmp_path, [
+        _entry("very-old", "2020-01-01T00:00:00+00:00"),
+        _entry("far-future", "2099-01-01T00:00:00+00:00"),
+    ])
+    before = path.read_bytes()
+    cache = ResponseCache(tmp_path)
+    assert cache.prune(30, dry_run=True) == PruneResult(removed=1, kept=1, unknown_age=0, dry_run=True)
+    assert path.read_bytes() == before
+    assert cache.prune(30) == PruneResult(removed=1, kept=1, unknown_age=0, dry_run=False)
+    assert _keys(path) == ["far-future"]
+
+
+def test_cli_cache_prune_by_provider_model_and_age(tmp_path, capsys):
+    cache_dir = tmp_path / "cache"
+    path = _write(cache_dir, [
+        _entry_for("a-old", "2020-01-01T00:00:00+00:00", provider="openai", model="gpt-a"),
+        _entry_for("a-new", "2099-01-01T00:00:00+00:00", provider="openai", model="gpt-a"),
+        _entry_for("b-old", "2020-01-01T00:00:00+00:00", provider="openai", model="gpt-b"),
+        _entry_for("l-old", "2020-01-01T00:00:00+00:00", provider="ollama", model="llama3.2"),
+    ])
+
+    # Dry run with model + age
+    assert main([
+        "cache", "prune", "--model", "gpt-a", "--older-than", "30",
+        "--dry-run", "--cache-dir", str(cache_dir),
+    ]) == 0
+    out = capsys.readouterr().out
+    assert "Would remove 1 cached response(s) for model gpt-a older than 30 day(s)" in out
+    assert len(_keys(path)) == 4
+
+    # Real run with model + age
+    assert main([
+        "cache", "prune", "--model", "gpt-a", "--older-than", "30",
+        "--cache-dir", str(cache_dir),
+    ]) == 0
+    out = capsys.readouterr().out
+    assert "Removed 1 cached response(s) for model gpt-a older than 30 day(s)" in out
+    assert _keys(path) == ["a-new", "b-old", "l-old"]
+
+    # Real run with provider only
+    assert main(["cache", "prune", "--provider", "openai", "--cache-dir", str(cache_dir)]) == 0
+    out = capsys.readouterr().out
+    assert "Removed 2 cached response(s) for provider openai" in out
+    assert _keys(path) == ["l-old"]
+
+    # Real run with model only
+    assert main(["cache", "prune", "--model", "llama3.2", "--cache-dir", str(cache_dir)]) == 0
+    out = capsys.readouterr().out
+    assert "Removed 1 cached response(s) for model llama3.2" in out
+    assert _keys(path) == []
+
+
+def test_cli_cache_prune_no_filter_exits_with_code_2(tmp_path, capsys):
+    with pytest.raises(SystemExit) as excinfo:
+        main(["cache", "prune", "--cache-dir", str(tmp_path)])
+    assert excinfo.value.code == 2
+    err = capsys.readouterr().err
+    assert "--older-than" in err
+    assert "--provider" in err
+    assert "--model" in err
