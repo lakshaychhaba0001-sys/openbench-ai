@@ -166,6 +166,7 @@ List stored experiment runs.
 | `--status` |  |  |  |  |
 | `--provider` |  |  |  |  |
 | `--model` |  |  |  |  |
+| `--dataset` |  |  |  |  |
 | `--format` |  | `text` | `text`, `json`, `csv`, `markdown` |  |
 | `--group` |  |  |  | *(v0.4.0)* list only the runs of this repeat group. |
 | `--wide` |  |  |  | v0.5.0: print the full one-line-per-run format (all scores, origin, dataset). |
