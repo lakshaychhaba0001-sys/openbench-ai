@@ -1187,7 +1187,10 @@ def _handle_inspect_dataset(args: argparse.Namespace) -> int:
             print(f"    * [{sample['id']}] ({sample['category']}): {sample['prompt']}")
     return 0
 
+
 def _print_dataset_stats_markdown(stats: dict[str, Any]) -> None:
+    from openbench.reporting_v040 import report_doc_markdown
+
     print(f"# Dataset Statistics: {escape_markdown_cell(stats['name'])} "
           f"(v{escape_markdown_cell(stats['version'])})")
     print()
@@ -1213,6 +1216,9 @@ def _print_dataset_stats_markdown(stats: dict[str, Any]) -> None:
     answer = stats["expected_answer_char_length"]
     print(f"| Prompt | {prompt['min']} | {prompt['max']} | {prompt['avg']} |")
     print(f"| Answer | {answer['min']} | {answer['max']} | {answer['avg']} |")
+    print()
+    print(report_doc_markdown())
+
 
 def _handle_dataset_stats(args: argparse.Namespace) -> int:
     stats = DatasetCatalog.compute_stats(
