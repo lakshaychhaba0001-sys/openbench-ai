@@ -279,3 +279,137 @@ def test_dashboard_model_link_escapes_values(tmp_path, monkeypatch):
                 'evil&amp;&lt;script&gt;</a>')
     assert expected in body
     assert "<script>" not in body
+
+def test_dashboard_dataset_filter(tmp_path, capsys):
+    datasets_dir = tmp_path / "datasets"
+    datasets_dir.mkdir()
+    alpha_ds = datasets_dir / "alpha.jsonl"
+    beta_ds = datasets_dir / "beta.jsonl"
+    rows = "\n".join(
+        json.dumps({"id": f"item_{i}", "category": "c", "prompt": f"q{i}",
+                    "expected_answer": f"a{i}"})
+        for i in range(3)
+    ) + "\n"
+    alpha_ds.write_text(rows, encoding="utf-8")
+    beta_ds.write_text(rows, encoding="utf-8")
+
+    experiments = tmp_path / "experiments"
+    assert main(["run", "--dataset", str(alpha_ds), "--provider", "mock", "--model", "m1",
+                 "--experiments-dir", str(experiments), "--no-cache"]) == 0
+    assert main(["run", "--dataset", str(beta_ds), "--provider", "mock", "--model", "m2",
+                 "--experiments-dir", str(experiments), "--no-cache",
+                 "--repetitions", "2", "--seed", "1"]) == 0
+    capsys.readouterr()
+
+    records = Dashboard(experiments).manager.list_runs()
+    alpha = [r for r in records if r.dataset_identifier == "alpha"]
+    beta = [r for r in records if r.dataset_identifier == "beta"]
+    beta_ids = [r.run_id for r in beta]
+
+    server = create_server(experiments, port=0)
+    serve_in_thread(server)
+    base = f"http://127.0.0.1:{server.server_address[1]}/"
+
+    def get_page(query=""):
+        with urllib.request.urlopen(base + query, timeout=10) as response:
+            assert response.status == 200
+            return response.read().decode("utf-8")
+
+    try:
+        body = get_page()
+        assert ('Dataset: <a href="/?dataset=alpha">alpha</a> · '
+                '<a href="/?dataset=beta">beta</a>') in body
+
+        body = get_page("?dataset=alpha")
+        assert "Runs (1)" in body
+        assert 'Active filters: dataset=alpha. <a href="/">Show all runs</a>' in body
+        assert 'href="/?status=completed&amp;dataset=alpha"' in body
+        assert alpha[0].run_id in body
+        for run_id in beta_ids:
+            assert run_id not in body
+
+        body = get_page("?dataset=BETA")
+        for run_id in beta_ids:
+            assert run_id in body
+        assert alpha[0].run_id not in body
+
+        body = get_page("?dataset=beta&model=m2&status=completed")
+        for run_id in beta_ids:
+            assert run_id in body
+        assert alpha[0].run_id not in body
+
+        body = get_page("?dataset=doesnotexist")
+        assert "Runs (0)" in body and "No runs found." in body
+
+        body = get_page("?provider=mock")
+        assert 'href="/?provider=mock&amp;dataset=alpha"' in body
+    finally:
+        server.shutdown()
+        server.server_close()
+
+
+def test_runs_list_dataset_filter(tmp_path, capsys):
+    datasets_dir = tmp_path / "datasets"
+    datasets_dir.mkdir()
+    alpha_ds = datasets_dir / "alpha.jsonl"
+    beta_ds = datasets_dir / "beta.jsonl"
+    rows = "\n".join(
+        json.dumps({"id": f"item_{i}", "category": "c", "prompt": f"q{i}",
+                    "expected_answer": f"a{i}"})
+        for i in range(3)
+    ) + "\n"
+    alpha_ds.write_text(rows, encoding="utf-8")
+    beta_ds.write_text(rows, encoding="utf-8")
+
+    experiments = tmp_path / "experiments"
+    assert main(["run", "--dataset", str(alpha_ds), "--provider", "mock", "--model", "m1",
+                 "--experiments-dir", str(experiments), "--no-cache"]) == 0
+    assert main(["run", "--dataset", str(beta_ds), "--provider", "mock", "--model", "m2",
+                 "--experiments-dir", str(experiments), "--no-cache",
+                 "--repetitions", "2", "--seed", "1"]) == 0
+    capsys.readouterr()
+
+    manager = Dashboard(experiments).manager
+    records = manager.list_runs()
+    alpha = [r for r in records if r.dataset_identifier == "alpha"]
+    beta = [r for r in records if r.dataset_identifier == "beta"]
+
+    # Existing positional call signature still works
+    assert [r.run_id for r in manager.list_runs("completed", "mock", None, "m1")] == [alpha[0].run_id]
+
+    assert main(["runs", "list", "--experiments-dir", str(experiments),
+                 "--dataset", "ALPHA", "--format", "json"]) == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert [r["run_id"] for r in payload] == [alpha[0].run_id]
+
+    assert main(["runs", "list", "--experiments-dir", str(experiments),
+                 "--dataset", "beta", "--wide"]) == 0
+    wide_out = capsys.readouterr().out
+    assert "dataset=beta" in wide_out
+    assert alpha[0].run_id not in wide_out
+    for run in beta:
+        assert run.run_id in wide_out
+
+    assert main(["runs", "list", "--experiments-dir", str(experiments),
+                 "--dataset", "doesnotexist"]) == 0
+    assert "No experiment runs found." in capsys.readouterr().out
+
+
+def test_dashboard_dataset_link_escapes_values(tmp_path, monkeypatch):
+    fake = SimpleNamespace(
+        run_id="run_fake1", status="completed", model_provider="mock",
+        model_name="m", dataset_identifier="evil&<script>",
+        is_mock_provider=False, completed_items=1, total_items=1,
+        aggregate_scores={}, repeat_group_id=None, created_at="2026-01-01",
+    )
+    dashboard = Dashboard(tmp_path)
+    monkeypatch.setattr(dashboard.manager, "list_runs", lambda **kwargs: [fake])
+    body = dashboard.index()
+    expected = ('Dataset: <a href="/?dataset=evil%26%3Cscript%3E">'
+                'evil&amp;&lt;script&gt;</a>')
+    assert expected in body
+    assert "<script>" not in body
+
+    filtered = dashboard.index(dataset="evil&<script>")
+    assert "dataset=evil&amp;&lt;script&gt;" in filtered
+    assert "<script>" not in filtered
