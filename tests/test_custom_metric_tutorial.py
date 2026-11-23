@@ -59,7 +59,6 @@ def test_custom_metric_tutorial(tmp_path):
     assert report("baseline.json")["aggregate_results"][METRIC]["score"] == 0.666667
     assert report("challenger.json")["aggregate_results"][METRIC]["score"] == 1.0
     assert report("comparison.json")["provider_calls"] == 0
-    assert report("comparison-binary.json")["provider_calls"] == 0
-    assert '"score_kind": "binary"' in json.dumps(report("comparison-binary.json"))
+    assert '"score_kind": "binary"' in json.dumps(report("comparison.json"))
     assert report("ranking.json")["metric"] == METRIC
-    assert report("ranking-binary.json")["score_kind"] == "binary"
+    assert report("ranking.json")["score_kind"] == "binary"

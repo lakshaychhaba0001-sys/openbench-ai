@@ -164,24 +164,8 @@ conclusion about comparative model performance.
 
 ### Use the declared statistical kind
 
-A fresh `analyze` or `rank` process may see an installed custom metric as
-`unknown` because these commands can read saved scores without importing the
-metric class. To analyze with the plugin's declaration in OpenBench 0.5.0, save
-this launcher as `openbench_with_plugins.py`:
-
-```python title="openbench_with_plugins.py"
-from openbench.cli import main
-from openbench.plugins import load_plugins
-
-if __name__ == "__main__":
-    load_plugins("metrics")
-    raise SystemExit(main())
-```
-
-```bash
-python openbench_with_plugins.py analyze --results baseline.json challenger.json --metrics tutorial_normalized_match --format json --output comparison-binary.json
-python openbench_with_plugins.py rank --results baseline.json challenger.json --metric tutorial_normalized_match --format json --output ranking-binary.json
-```
+`analyze` and `rank` read the `score_kind` that the installed plugin declares,
+so the metric above is treated as `binary` without any extra step.
 
 Use `binary` only for item scores that are always 0 or 1. A single-run paired
 comparison can then use the exact McNemar test. Use `bounded_continuous` for

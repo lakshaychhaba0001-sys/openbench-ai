@@ -29,11 +29,30 @@ METRIC_UNAVAILABLE = "metric_unavailable"
 ABSENT = "absent"
 
 
+_plugin_load_failed = False
+
+
 def metric_score_kind(metric_name: str) -> str:
-    """Return the declared ``score_kind`` of a registered metric, or ``"unknown"``."""
+    """Return the declared ``score_kind`` of a registered metric, or ``"unknown"``.
+
+    A name that is not registered may belong to an installed plugin, so plugins are loaded
+    once and the lookup is repeated (as ``create_metric`` does). A plugin that fails to load
+    leaves the kind ``"unknown"``; the failure is remembered because ``load_plugins`` does not
+    record a failed group as loaded and would otherwise retry on every lookup.
+    """
+    global _plugin_load_failed
+    from openbench.exceptions import PluginError
     from openbench.metrics import METRIC_REGISTRY
 
-    cls = METRIC_REGISTRY.get(metric_name.strip().lower())
+    key = metric_name.strip().lower()
+    if key not in METRIC_REGISTRY and not _plugin_load_failed:
+        from openbench.plugins import load_plugins
+
+        try:
+            load_plugins("metrics")
+        except PluginError:
+            _plugin_load_failed = True
+    cls = METRIC_REGISTRY.get(key)
     kind = getattr(cls, "score_kind", "unknown") if cls is not None else "unknown"
     return kind if kind in {"binary", "bounded_continuous", "unknown"} else "unknown"
 
