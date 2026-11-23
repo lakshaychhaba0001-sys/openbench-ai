@@ -304,3 +304,39 @@ def test_cli_plain_validation_explains_audit_flags(tmp_path, capsys, monkeypatch
     assert captured.out.startswith("Dataset valid:")
     assert "--output and --format only apply with --quality-checks" in captured.err
     assert not (tmp_path / "audit.md").exists()
+
+
+@pytest.mark.parametrize(
+    ("filename", "expected_format", "prefix"),
+    [
+        ("audit.md", "markdown", "# OpenBench AI quality audit"),
+        ("audit.markdown", "markdown", "# OpenBench AI quality audit"),
+        ("audit.csv", "csv", "check_id,severity,"),
+        ("audit.json", "json", "{"),
+        ("audit.txt", "json", "{"),
+    ],
+)
+def test_cli_runs_verify_audit_output_format(
+    tmp_path, capsys, monkeypatch, filename, expected_format, prefix
+):
+    monkeypatch.chdir(ROOT)
+    manager = _fixture_runs(tmp_path)
+    output = tmp_path / filename
+    code = main(["runs", "verify", "run_v031fixturea", "--experiments-dir", str(manager.root),
+                 "--quality-checks", "--audit-output", str(output)])
+    assert code == 0
+    assert output.read_text(encoding="utf-8").startswith(prefix)
+    message = capsys.readouterr().out.splitlines()[-1]
+    assert message == f"Audit report ({expected_format}) written to: {output}"
+
+
+def test_cli_runs_verify_audit_output_without_quality_checks(tmp_path, capsys, monkeypatch):
+    monkeypatch.chdir(ROOT)
+    manager = _fixture_runs(tmp_path)
+    output = tmp_path / "audit.md"
+    code = main(["runs", "verify", "run_v031fixturea", "--experiments-dir", str(manager.root),
+                 "--audit-output", str(output)])
+    assert code == 0
+    captured = capsys.readouterr()
+    assert "--audit-output only applies with --quality-checks; no audit was written." in captured.err
+    assert not output.exists()
