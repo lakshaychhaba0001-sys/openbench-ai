@@ -62,11 +62,13 @@ openbench run   --dataset datasets/reasoning/sample.jsonl   --provider mock   --
 `openbench run` stores every response in a local cache (`.openbench_cache` by default, or `--cache-dir`), so repeated runs do not call the model again. These commands manage it:
 
 ```bash
-openbench cache stats                         # what is in the cache, and how old it is
-openbench cache stats --format text           # the same as a short readable summary
-openbench cache prune --older-than 30 --dry-run   # report what would be removed
-openbench cache prune --older-than 30         # remove entries cached more than 30 days ago
-openbench cache clear                         # remove everything
+openbench cache stats                                     # what is in the cache, and how old it is
+openbench cache stats --format text                       # the same as a short readable summary
+openbench cache prune --older-than 30 --dry-run           # report what would be removed
+openbench cache prune --older-than 30                     # remove entries cached more than 30 days ago
+openbench cache prune --model gpt-4o --dry-run            # preview removing one model's entries
+openbench cache prune --provider openai --older-than 30   # combine filters (all must match)
+openbench cache clear                                     # remove everything
 ```
 
 `cache stats` prints JSON by default (`--format text` gives a short summary with one line per provider and model). It keeps the `enabled`, `cache_dir`, `stored_entries`, `session_hits` and `session_misses` keys and adds:
@@ -80,6 +82,6 @@ openbench cache clear                         # remove everything
 
 `stats` never creates the cache folder, and it reports a corrupted cache file as an error instead of a traceback. Run it before `prune` to see how much a given `--older-than` would affect.
 
-`--older-than DAYS` must be a positive integer. Each entry records when it was cached, and `prune` removes the entries older than the cut-off. Entries whose `cached_at` is missing or unreadable are never removed; the command reports how many it kept for that reason. `--dry-run` only reports and changes nothing. All the cache commands accept `--cache-dir`.
+`prune` requires at least one of `--older-than DAYS` (a positive integer), `--provider NAME`, or `--model NAME`. When several filters are given, an entry is removed only if it matches all of them. Entries whose `cached_at` is missing or unreadable are never removed when `--older-than` is active (the command reports how many it kept for that reason), but are removed if they match `--provider` and/or `--model` with no age filter. `--dry-run` only reports and changes nothing. All the cache commands accept `--cache-dir`.
 
 `prune` takes the same cross-process lock as the run commands and swaps in the rewritten file in one step. If the cache file is corrupted, `prune` reports the first bad line and leaves the file untouched; use `openbench cache clear` to start over.

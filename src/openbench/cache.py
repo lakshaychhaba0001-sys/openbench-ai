@@ -65,9 +65,10 @@ class CacheRecord:
 class PruneResult:
     """Outcome of :meth:`ResponseCache.prune`.
 
-    ``removed`` entries were older than the cut-off (with ``dry_run`` they only *would* be
-    removed). ``kept`` entries are newer. ``unknown_age`` entries have a missing or unreadable
-    ``cached_at``; they are always kept and are not part of ``kept``.
+    ``removed`` entries matched all supplied filters (with ``dry_run`` they only *would* be
+    removed). ``kept`` entries did not match and remain in the cache. ``unknown_age`` entries
+    matched any provider/model filters when an age filter was active, but had a missing or
+    unreadable ``cached_at``; they are always kept and are not part of ``kept``.
     """
 
     removed: int
@@ -218,22 +219,22 @@ class ResponseCache:
         if not isinstance(data, dict):
             raise TypeError("entry is not a JSON object")
         return CacheRecord(
-                cache_key=str(data["cache_key"]),
-                provider_name=str(data["provider_name"]),
-                model_name=str(data["model_name"]),
-                model_version=str(data["model_version"]),
-                dataset_name=str(data["dataset_name"]),
-                dataset_version=str(data["dataset_version"]),
-                record_id=str(data["record_id"]),
-                prompt_sha256=str(data["prompt_sha256"]),
-                generation_config_sha256=str(data["generation_config_sha256"]),
-                response=str(data["response"]),
-                latency_ms=data.get("latency_ms"),
-                token_usage=data.get("token_usage"),
-                cached_at=str(data["cached_at"]),
-                repeat_group_id=data.get("repeat_group_id"),
-                repetition_index=data.get("repetition_index"),
-            )
+            cache_key=str(data["cache_key"]),
+            provider_name=str(data["provider_name"]),
+            model_name=str(data["model_name"]),
+            model_version=str(data["model_version"]),
+            dataset_name=str(data["dataset_name"]),
+            dataset_version=str(data["dataset_version"]),
+            record_id=str(data["record_id"]),
+            prompt_sha256=str(data["prompt_sha256"]),
+            generation_config_sha256=str(data["generation_config_sha256"]),
+            response=str(data["response"]),
+            latency_ms=data.get("latency_ms"),
+            token_usage=data.get("token_usage"),
+            cached_at=str(data["cached_at"]),
+            repeat_group_id=data.get("repeat_group_id"),
+            repetition_index=data.get("repetition_index"),
+        )
 
     def get(
         self,
@@ -345,29 +346,57 @@ class ResponseCache:
                         self._index_path.unlink()
             return count
 
-    def prune(self, older_than_days: int, dry_run: bool = False, now: datetime | None = None) -> PruneResult:
-        """Remove entries whose ``cached_at`` is more than ``older_than_days`` days before ``now``.
+    def prune(
+        self,
+        older_than_days: int | None = None,
+        dry_run: bool = False,
+        now: datetime | None = None,
+        *,
+        provider: str | None = None,
+        model: str | None = None,
+    ) -> PruneResult:
+        """Remove entries matching all supplied filters (age, ``provider``, and/or ``model``).
 
-        Entries with a missing or unreadable ``cached_at`` are kept and counted separately in
-        ``PruneResult.unknown_age``. With ``dry_run`` nothing is changed. Like ``put`` and
-        ``clear``, this holds the in-process and the cross-process file lock; the file is
+        At least one of ``older_than_days``, ``provider``, or ``model`` is required. When
+        ``older_than_days`` is set, entries with a missing or unreadable ``cached_at`` are never
+        removed by the age filter and are counted separately in ``PruneResult.unknown_age``. When
+        filtering only by ``provider`` and/or ``model``, entry age is ignored and matching entries
+        are removed regardless of ``cached_at``. With ``dry_run`` nothing is changed. Like ``put``
+        and ``clear``, this holds the in-process and the cross-process file lock; the file is
         rewritten to a temporary file and swapped in, so a failure never leaves a half-written
         cache. An entry is judged by its last line, the one a load uses; earlier lines for the same
-        key are not counted, and are dropped whenever the file is rewritten. A corrupted cache file is reported and left untouched.
+        key are not counted, and are dropped whenever the file is rewritten. A corrupted cache file
+        is reported and left untouched.
         """
-        if isinstance(older_than_days, bool) or not isinstance(older_than_days, int) or older_than_days < 1:
+        if older_than_days is not None and (
+            isinstance(older_than_days, bool) or not isinstance(older_than_days, int) or older_than_days < 1
+        ):
             raise OpenBenchError("older_than_days must be a positive integer")
-        reference = now or datetime.now(timezone.utc)
-        if reference.tzinfo is None:
-            reference = reference.replace(tzinfo=timezone.utc)
-        cutoff = reference - timedelta(days=older_than_days)
+        if provider is not None:
+            if not isinstance(provider, str) or not provider.strip():
+                raise OpenBenchError("provider must be a non-empty string")
+            provider = provider.strip()
+        if model is not None:
+            if not isinstance(model, str) or not model.strip():
+                raise OpenBenchError("model must be a non-empty string")
+            model = model.strip()
+        if older_than_days is None and provider is None and model is None:
+            raise OpenBenchError("Specify at least one filter: older_than_days, provider, or model")
+
+        cutoff: datetime | None = None
+        if older_than_days is not None:
+            reference = now or datetime.now(timezone.utc)
+            if reference.tzinfo is None:
+                reference = reference.replace(tzinfo=timezone.utc)
+            cutoff = reference - timedelta(days=older_than_days)
+
         if not self._index_path.exists():
             return PruneResult(0, 0, 0, dry_run)  # nothing to prune; do not create the directory
         with self._lock, self._file_lock:
             if not self._index_path.exists():
                 return PruneResult(0, 0, 0, dry_run)
             text = self._index_path.read_text(encoding="utf-8")
-            latest: dict[str, tuple[int, str, Any]] = {}
+            latest: dict[str, tuple[int, str, Any, Any, Any]] = {}
             for line_no, line in enumerate(text.splitlines(), start=1):
                 stripped = line.strip()
                 if not stripped:
@@ -380,19 +409,35 @@ class ResponseCache:
                         f"Corrupted cache file {self._index_path}: line {line_no} is not a valid cache "
                         "entry. Nothing was pruned; clear the cache with 'openbench cache clear'."
                     ) from exc
-                latest[key] = (line_no, stripped, data.get("cached_at"))
+                latest[key] = (
+                    line_no,
+                    stripped,
+                    data.get("cached_at"),
+                    data.get("provider_name"),
+                    data.get("model_name"),
+                )
             keep: list[str] = []
             removed = kept = unknown = 0
-            for _, stripped, cached_at in sorted(latest.values()):
-                when = _parse_cached_at(cached_at)
-                if when is None:
-                    unknown += 1
-                elif when < cutoff:
-                    removed += 1
-                    continue
-                else:
+            for _, stripped, cached_at, entry_provider, entry_model in sorted(latest.values()):
+                if provider is not None and entry_provider != provider:
                     kept += 1
-                keep.append(stripped)
+                    keep.append(stripped)
+                    continue
+                if model is not None and entry_model != model:
+                    kept += 1
+                    keep.append(stripped)
+                    continue
+                if cutoff is not None:
+                    when = _parse_cached_at(cached_at)
+                    if when is None:
+                        unknown += 1
+                        keep.append(stripped)
+                        continue
+                    if when >= cutoff:
+                        kept += 1
+                        keep.append(stripped)
+                        continue
+                removed += 1
             if removed and not dry_run:
                 tmp = self._index_path.with_suffix(".jsonl.tmp")
                 tmp.write_text("".join(f"{entry}\n" for entry in keep), encoding="utf-8")

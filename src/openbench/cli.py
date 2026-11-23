@@ -700,19 +700,34 @@ def build_parser() -> argparse.ArgumentParser:
 
     cache_prune_p = cache_subparsers.add_parser(
         "prune",
-        help="Remove cached responses older than a number of days.",
+        help="Remove cached responses matching an age, provider, and/or model filter.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=_examples(
             "openbench cache prune --older-than 30 --dry-run",
-            "openbench cache prune --older-than 30 --cache-dir .openbench_cache",
+            "openbench cache prune --model gpt-4o --dry-run",
+            "openbench cache prune --provider openai --older-than 30 --cache-dir .openbench_cache",
         ),
     )
     cache_prune_p.add_argument(
         "--older-than",
         type=_positive_int,
-        required=True,
+        default=None,
         metavar="DAYS",
         help="Remove entries cached more than DAYS days ago (a positive integer).",
+    )
+    cache_prune_p.add_argument(
+        "--provider",
+        type=str,
+        default=None,
+        metavar="NAME",
+        help="Remove entries belonging to provider NAME.",
+    )
+    cache_prune_p.add_argument(
+        "--model",
+        type=str,
+        default=None,
+        metavar="NAME",
+        help="Remove entries belonging to model NAME.",
     )
     cache_prune_p.add_argument("--dry-run", action="store_true", help="Only report what would be removed.")
     cache_prune_p.add_argument("--cache-dir", type=str, default=None)
@@ -2671,14 +2686,41 @@ def _handle_cache(args: argparse.Namespace) -> int:
         print(f"Cleared {cleared} cached response(s) from {cache.cache_dir}")
         return 0
     if args.cache_action == "prune":
+        if args.older_than is None and args.provider is None and args.model is None:
+            print(
+                "Error: Specify at least one filter: --older-than, --provider, or --model.",
+                file=sys.stderr,
+            )
+            return 2
         try:
-            result = cache.prune(args.older_than, dry_run=args.dry_run)
+            result = cache.prune(
+                args.older_than,
+                dry_run=args.dry_run,
+                provider=args.provider,
+                model=args.model,
+            )
         except OpenBenchError as exc:
             print(f"Error: {exc}", file=sys.stderr)
             return 1
         verb = "Would remove" if result.dry_run else "Removed"
-        print(f"{verb} {result.removed} cached response(s) older than {args.older_than} day(s) from {cache.cache_dir}")
-        print(f"Kept {result.kept} newer entr{'y' if result.kept == 1 else 'ies'}.")
+        provider_name = args.provider.strip() if args.provider is not None else None
+        model_name = args.model.strip() if args.model is not None else None
+        filter_parts: list[str] = []
+        if provider_name is not None and model_name is not None:
+            filter_parts.append(f"for provider {provider_name} and model {model_name}")
+        elif provider_name is not None:
+            filter_parts.append(f"for provider {provider_name}")
+        elif model_name is not None:
+            filter_parts.append(f"for model {model_name}")
+        if args.older_than is not None:
+            filter_parts.append(f"older than {args.older_than} day(s)")
+        filter_desc = " ".join(filter_parts)
+        print(f"{verb} {result.removed} cached response(s) {filter_desc} from {cache.cache_dir}")
+        kept_unit = "entry" if result.kept == 1 else "entries"
+        if provider_name is None and model_name is None:
+            print(f"Kept {result.kept} newer {kept_unit}.")
+        else:
+            print(f"Kept {result.kept} remaining {kept_unit}.")
         if result.unknown_age:
             unit = "entry" if result.unknown_age == 1 else "entries"
             print(f"Kept {result.unknown_age} {unit} with a missing or unreadable cached_at.")
@@ -2733,6 +2775,18 @@ def main(argv: Sequence[str] | None = None) -> int:
     if not args.command:
         parser.print_help()
         return 2
+
+    if (
+        args.command == "cache"
+        and args.cache_action == "prune"
+        and args.older_than is None
+        and args.provider is None
+        and args.model is None
+    ):
+        parser.error(
+            "openbench cache prune requires at least one filter: "
+            "--older-than, --provider, or --model."
+        )
 
     try:
         if args.command == "validate-dataset":
