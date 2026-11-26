@@ -583,6 +583,7 @@ class ExperimentManager:
         provider: str | None = None,
         repeat_group_id: str | None = None,
         model: str | None = None,
+        dataset: str | None = None,
     ) -> list[ExperimentRecord]:
         """List all experiment runs stored under `self.root` (optionally one repeat group)."""
         if not self.root.exists():
@@ -604,6 +605,8 @@ class ExperimentManager:
             if provider and rec.model_provider.lower() != provider.lower():
                 continue
             if model and rec.model_name.lower() != model.lower():
+                continue
+            if dataset and rec.dataset_identifier.lower() != dataset.lower():
                 continue
             if repeat_group_id is not None and rec.repeat_group_id != repeat_group_id:
                 continue

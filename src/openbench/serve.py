@@ -51,14 +51,15 @@ class Dashboard:
         self.reports_dir = Path(reports_dir) if reports_dir else None
 
     # -- pages ---------------------------------------------------------------------------------
-    def index(self, status: str = "", provider: str = "", group: str = "", model: str = "") -> str:
+    def index(self, status: str = "", provider: str = "", group: str = "", model: str = "", dataset: str = "") -> str:
         status = status.strip()
         provider = provider.strip()
         group = group.strip()
         model = model.strip()
+        dataset = dataset.strip()
         if self.experiments_dir.exists():
             runs = self.manager.list_runs(status=status or None, provider=provider or None,
-                                          model=model or None, repeat_group_id=group or None)
+                                          model=model or None, repeat_group_id=group or None, dataset=dataset or None)
             all_runs = self.manager.list_runs()
         else:
             runs = []
@@ -67,10 +68,11 @@ class Dashboard:
         statuses = sorted({r.status for r in all_runs if r.status})
         providers = sorted({r.model_provider for r in all_runs if r.model_provider})
         models = sorted({r.model_name for r in all_runs if r.model_name})
+        datasets = sorted({getattr(r, "dataset_identifier", "") for r in all_runs if getattr(r, "dataset_identifier", "")})
         all_groups = sorted({r.repeat_group_id for r in all_runs if r.repeat_group_id})
 
         def filter_url(**changes: str) -> str:
-            params = {"status": status, "provider": provider, "group": group, "model": model}
+            params = {"status": status, "provider": provider, "group": group, "model": model, "dataset": dataset}
             params.update(changes)
             query = urlencode({k: v for k, v in params.items() if v})
             return f"/?{query}" if query else "/"
@@ -97,6 +99,8 @@ class Dashboard:
             active.append(f"group={esc(group)}")
         if model:
             active.append(f"model={esc(model)}")
+        if dataset:
+            active.append(f"dataset={esc(dataset)}")
         if active:
             body.append(f"<p class=\"meta\">Active filters: {', '.join(active)}."
                         f" <a href=\"/\">Show all runs</a></p>")
@@ -106,6 +110,8 @@ class Dashboard:
             body.append(link_line("Provider", "provider", providers))
         if models:
             body.append(link_line("Model", "model", models))
+        if datasets:
+            body.append(link_line("Dataset","dataset", datasets))
         if all_groups:
             body.append(link_line("Group", "group", all_groups))
         if rows:
@@ -266,6 +272,7 @@ def make_handler(dashboard: Dashboard) -> type[BaseHTTPRequestHandler]:
                         provider=query.get("provider", [""])[0],
                         group=query.get("group", [""])[0],
                         model=query.get("model", [""])[0],
+                        dataset=query.get("dataset", [""])[0],
                     ), head=head)
                 if path.startswith("/runs/"):
                     requested_page = parse_qs(target.query, keep_blank_values=True).get("page", ["1"])[0]

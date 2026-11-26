@@ -28,7 +28,7 @@ experiments/
 # 1. Create and execute a new run
 openbench run --config configs/mock_experiment.yaml
 
-# 2. List all stored runs (optionally filter by --status, --provider or --model)
+# 2. List all stored runs (optionally filter by --status, --provider, --model or --dataset)
 openbench runs list
 
 # 3. Inspect a specific run's summary and integrity status
@@ -51,4 +51,3 @@ New runs record a `lineage` block in `config.json` and `reproducibility.json` (s
 `openbench run --repetitions N` creates a repeat group (`grp_<id>`) with a rebuildable index file `experiments/grp_<id>.json`. `runs list --group`, `runs show grp_...`, `runs verify grp_...` and `runs resume grp_...` operate on groups.
 
 v0.3.x runs remain readable and are never rewritten. See [repeated_runs.md](repeated_runs.md) and [reproducibility.md](reproducibility.md).
-
