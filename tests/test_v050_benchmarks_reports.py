@@ -324,6 +324,7 @@ def test_markdown_reports_link_to_the_documentation(tmp_path, capsys):
         ["rank", *inputs, "--metric", "exact_match"],
         ["plan", "--items", "200", "--baseline-accuracy", "0.7"],
         ["dataset-card", str(ROOT / "datasets/reasoning/sample.jsonl")],
+        ["dataset-stats", str(ROOT / "datasets/reasoning/sample.jsonl")],
     ):
         assert main([*command, "--format", "markdown"]) == 0
         lines = capsys.readouterr().out.rstrip().splitlines()
