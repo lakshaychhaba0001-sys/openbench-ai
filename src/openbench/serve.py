@@ -68,7 +68,7 @@ class Dashboard:
         statuses = sorted({r.status for r in all_runs if r.status})
         providers = sorted({r.model_provider for r in all_runs if r.model_provider})
         models = sorted({r.model_name for r in all_runs if r.model_name})
-        datasets = sorted({getattr(r, "dataset_identifier", "") for r in all_runs if getattr(r, "dataset_identifier", "")})
+        datasets = sorted({r.dataset_identifier for r in all_runs if r.dataset_identifier})
         all_groups = sorted({r.repeat_group_id for r in all_runs if r.repeat_group_id})
 
         def filter_url(**changes: str) -> str:
@@ -111,7 +111,7 @@ class Dashboard:
         if models:
             body.append(link_line("Model", "model", models))
         if datasets:
-            body.append(link_line("Dataset","dataset", datasets))
+            body.append(link_line("Dataset", "dataset", datasets))
         if all_groups:
             body.append(link_line("Group", "group", all_groups))
         if rows:
