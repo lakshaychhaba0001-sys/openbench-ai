@@ -459,7 +459,7 @@ def build_parser() -> argparse.ArgumentParser:
     runs_list_p.add_argument("--status", type=str, default=None)
     runs_list_p.add_argument("--provider", type=str, default=None)
     runs_list_p.add_argument("--model", type=str, default=None)
-    runs_list_p.add_argument("--dataset",type=str, default=None)
+    runs_list_p.add_argument("--dataset", type=str, default=None)
     runs_list_p.add_argument("--format", choices=["text", "json", "csv", "markdown"], default="text")
     runs_list_p.add_argument(
         "--group", type=str, default=None, help="v0.4.0: list only the runs of this repeat group."

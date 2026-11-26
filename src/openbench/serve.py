@@ -111,7 +111,7 @@ class Dashboard:
         if models:
             body.append(link_line("Model", "model", models))
         if datasets:
-            body.append(link_line("Dataset","dataset", datasets))
+            body.append(link_line("Dataset", "dataset", datasets))
         if all_groups:
             body.append(link_line("Group", "group", all_groups))
         if rows:
