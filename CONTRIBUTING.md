@@ -44,6 +44,9 @@ Before submitting a pull request, run the full validation suite locally:
 # 1. Run all unit and CLI tests with SyntaxWarning treated as error
 pytest -W error::SyntaxWarning -v
 
+# Run with code coverage report
+pytest --cov=openbench --cov-report=term-missing
+
 # 2. Check code formatting and linting with Ruff
 ruff check src tests examples scripts
 
