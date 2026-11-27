@@ -34,6 +34,14 @@ Verify that the CLI is installed properly:
 openbench --version
 ```
 
+### Optional: pre-commit
+To run formatting and lint checks automatically before every commit:
+
+```bash
+python -m pip install -e ".[dev]"
+pre-commit install
+```
+
 ---
 
 ## 2. Running Tests and Linters
