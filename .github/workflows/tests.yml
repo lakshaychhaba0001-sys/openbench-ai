@@ -90,7 +90,19 @@ jobs:
         run: python scripts/validate_datasets.py
 
       - name: Run pytest suite with SyntaxWarning treated as error
-        run: pytest -W error::SyntaxWarning -v
+        run: |
+          if [ "${{ matrix.python-version }}" = "3.12" ]; then
+            pytest -W error::SyntaxWarning -v --cov=openbench --cov-report=term-missing --cov-report=xml
+          else
+            pytest -W error::SyntaxWarning -v
+          fi
+
+      - name: Upload test coverage report artifact
+        if: matrix.python-version == '3.12'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-python-3.12
+          path: coverage.xml
 
       - name: Run CLI smoke tests
         run: |
