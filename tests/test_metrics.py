@@ -4,8 +4,9 @@ from __future__ import annotations
 
 import pytest
 
+from openbench.configuration import ProfileLoader
 from openbench.dataset import DatasetRecord
-from openbench.exceptions import MetricError
+from openbench.exceptions import ConfigurationError, MetricError
 from openbench.metrics import (
     AccuracyMetric,
     BaseMetric,
@@ -54,6 +55,78 @@ def test_normalization_configurable_case_and_punctuation() -> None:
         strip_punctuation=True,
     )
     assert normalize_text(" Answer: 42! ", cfg) == "Answer 42"
+
+
+def test_normalization_unicode_nfkc() -> None:
+    """NFKC normalizes full-width, Japanese, and compatibility characters."""
+    cfg = NormalizationConfig(unicode_normalization="NFKC")
+    assert normalize_text("\uff21\uff22\uff23\uff11\uff12\uff13", cfg) == "abc123"
+    assert normalize_text("\uff83\uff7d\uff84", cfg) == "\u30c6\u30b9\u30c8"
+    assert normalize_text("cafe\u0301 \ufb01", cfg) == "caf\u00e9 fi"
+
+
+def test_normalization_unicode_nfc_hindi_and_latin() -> None:
+    """NFC composes Latin accents; U+0958 is a Unicode composition exclusion."""
+    cfg = NormalizationConfig(unicode_normalization="NFC")
+    assert normalize_text("cafe\u0301", cfg) == "caf\u00e9"
+    assert normalize_text("\u0915\u093c", cfg) == "\u0915\u093c"
+    assert (
+        normalize_text("\u0928\u092e\u0938\u094d\u0924\u0947", cfg)
+        == "\u0928\u092e\u0938\u094d\u0924\u0947"
+    )
+
+
+def test_normalization_strip_unicode_punctuation() -> None:
+    """strip_unicode_punctuation removes Unicode P* punctuation when enabled."""
+    cfg = NormalizationConfig(strip_punctuation=True, strip_unicode_punctuation=True)
+    raw = "\u201cHello\u2014world!\u201d \u0928\u092e\u0938\u094d\u0924\u0947\u0964"
+    assert normalize_text(raw, cfg) == "helloworld \u0928\u092e\u0938\u094d\u0924\u0947"
+
+
+def test_normalization_config_to_dict_and_defaults() -> None:
+    """to_dict includes Unicode fields and default config preserves prior behavior."""
+    default_cfg = NormalizationConfig()
+    assert default_cfg.unicode_normalization is None
+    assert default_cfg.strip_unicode_punctuation is False
+    assert "unicode_normalization" not in default_cfg.to_dict()
+    assert "strip_unicode_punctuation" not in default_cfg.to_dict()
+    assert (
+        normalize_text("  \u201cHello\u2014OpenBench!\u201d \uff21  ")
+        == "\u201chello\u2014openbench!\u201d \uff41"
+    )
+
+    custom_dict = NormalizationConfig(
+        unicode_normalization="NFKC",
+        strip_unicode_punctuation=True,
+    ).to_dict()
+    assert custom_dict["unicode_normalization"] == "NFKC"
+    assert custom_dict["strip_unicode_punctuation"] is True
+
+
+def test_normalization_invalid_unicode_normalization_raises() -> None:
+    """Invalid unicode_normalization mode raises ValueError."""
+    with pytest.raises(ValueError):
+        NormalizationConfig(unicode_normalization="NFD")
+
+
+def test_normalization_profile_loader_unicode_options() -> None:
+    """ProfileLoader accepts valid Unicode normalization options and rejects NFD."""
+    profile = ProfileLoader.validate_dict(
+        {
+            "name": "test-prof",
+            "normalization": {
+                "unicode_normalization": "NFKC",
+                "strip_unicode_punctuation": True,
+                },
+        }
+    )
+    assert profile.normalization.unicode_normalization == "NFKC"
+    assert profile.normalization.strip_unicode_punctuation is True
+    with pytest.raises(ConfigurationError):
+        ProfileLoader.validate_dict({
+            "name": "test-prof",
+            "normalization": {"unicode_normalization": "NFD"},
+            })
 
 
 def test_exact_match_metric_passes_and_fails_accurately() -> None:

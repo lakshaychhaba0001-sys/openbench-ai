@@ -48,6 +48,8 @@ ALLOWED_NORMALIZATION_KEYS = {
     "case_sensitive",
     "collapse_whitespace",
     "strip_punctuation",
+    "unicode_normalization",
+    "strip_unicode_punctuation",
 }
 ALLOWED_PROVIDER_KEYS = {
     "name",
@@ -300,12 +302,20 @@ class ProfileLoader:
         if unknown_norm:
             raise ConfigurationError(
                 f"Unknown field(s) in 'normalization'{loc}: {sorted(unknown_norm)}"
+        )
+        unicode_norm_raw = norm_raw.get("unicode_normalization", None)
+        if unicode_norm_raw is not None and unicode_norm_raw not in ("NFC", "NFKC"):
+            raise ConfigurationError(
+                f"Invalid 'normalization.unicode_normalization'{loc}: "
+                f"{unicode_norm_raw!r}. Expected 'NFC', 'NFKC', or null."
             )
         norm_cfg = NormalizationConfig(
             strip_whitespace=bool(norm_raw.get("strip_whitespace", True)),
             case_sensitive=bool(norm_raw.get("case_sensitive", False)),
             collapse_whitespace=bool(norm_raw.get("collapse_whitespace", True)),
             strip_punctuation=bool(norm_raw.get("strip_punctuation", False)),
+            unicode_normalization=unicode_norm_raw,
+            strip_unicode_punctuation=bool(norm_raw.get("strip_unicode_punctuation", False)),
         )
 
         # 4. Options section
