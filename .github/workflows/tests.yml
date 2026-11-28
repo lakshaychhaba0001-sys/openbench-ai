@@ -53,7 +53,7 @@ jobs:
           openbench --help
           openbench validate-dataset datasets/reasoning/sample.jsonl
           openbench evaluate             --dataset datasets/reasoning/sample.jsonl             --responses examples/sample_responses.json             --metrics exact_match accuracy keyword_coverage             --output results/core_only/
-          python -c "import json, pathlib; p = pathlib.Path('results/core_only/alphabaseline-7b.json'); data = json.loads(p.read_text()); assert data['project_version'] == '0.5.0'"
+          python -c "import json, pathlib; p = pathlib.Path('results/core_only/alphabaseline-7b.json'); data = json.loads(p.read_text()); assert data['project_version'] == '0.5.1'"
 
       - name: Verify v0.4.0 features without optional dependencies
         run: |
@@ -208,7 +208,7 @@ jobs:
           for required in ("openbench/quality_notes.json", "openbench/py.typed", "openbench/stats/variability.py", "openbench/paired.py", "openbench/preferences.py", "openbench/quality.py"):
               assert required in names, required
           meta = zipfile.ZipFile(wheel).read([n for n in names if n.endswith("METADATA")][0]).decode()
-          assert "Version: 0.5.0" in meta
+          assert "Version: 0.5.1" in meta
           assert all("extra ==" in line for line in meta.splitlines() if line.startswith("Requires-Dist"))
           print(wheel, "ok")
           PY
