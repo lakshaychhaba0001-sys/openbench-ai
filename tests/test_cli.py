@@ -357,5 +357,5 @@ def test_cli_runs_compare_format_csv(tmp_path: Path, capsys: pytest.CaptureFixtu
     ]) == 0
 
     captured = capsys.readouterr().out
-    assert captured == file_content
-
+    assert "\r" not in captured
+    assert captured == file_content.replace("\r\n", "\n")

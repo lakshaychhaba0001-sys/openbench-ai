@@ -1869,7 +1869,7 @@ def _handle_runs(args: argparse.Namespace) -> int:
         if args.format == "json":
             print(ReportGenerator.to_json(comparison))
         elif args.format == "csv":
-            print(ReportGenerator.to_csv(comparison), end="")
+            sys.stdout.write(ReportGenerator.to_csv(comparison).replace("\r\n", "\n"))
         else:
             print(ReportGenerator.comparison_to_markdown(comparison))
         return 0
