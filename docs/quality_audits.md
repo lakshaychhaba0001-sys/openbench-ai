@@ -9,6 +9,7 @@ openbench runs verify run_<id> --quality-checks          # or grp_<id>
 ```
 
 Unless you pass `--format`, the dataset audit writes Markdown for `.md` or `.markdown`, CSV for `.csv`, and JSON for all other filenames.
+For `runs verify --quality-checks --audit-output <file>`, the written audit uses the same extension rules (`.md`/`.markdown` for Markdown, `.csv` for CSV, and `.json` or other extensions for JSON).
 Without `--quality-checks`, `validate-dataset` runs normal validation and prints a note to stderr if you pass `--output` or `--format`.
 
 Each finding has a stable check ID, a severity (`error`, `warning` or `info`), a title, an explanation, the affected record or run IDs, a suggested remediation, details and, for reviewed records, a classification.
