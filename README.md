@@ -260,7 +260,13 @@ See the [statistical methodology](docs/statistical_methodology.md).
 - **Comparison, ranking & reports**: [Repeated runs](docs/repeated_runs.md) | [Model comparison](docs/model_comparison.md) | [Reading a comparison report](docs/reading_a_report.md) | [Ranking & planning](docs/ranking_and_planning.md) | [LLM judge](docs/llm_judge.md) | [Benchmark tools](docs/benchmark_tools.md) | [HTML reports & dashboard](docs/dashboard.md) | [Human preferences](docs/human_preferences.md) | [Quality audits](docs/quality_audits.md) | [Reproducibility & reports](docs/reproducibility.md) | [Statistical methodology](docs/statistical_methodology.md) | [CLI reference](docs/cli_reference.md) | [Python API](docs/api_reference.md) | [Migration from v0.3.1](V0_4_0_MIGRATION_GUIDE.md)
 - **Execution, providers & integrity**: [Model Execution Engine](docs/model_execution.md) | [Providers](docs/providers.md) | [Ollama](docs/ollama.md) | [Hugging Face (experimental)](docs/huggingface.md) | [Custom providers](docs/custom_provider.md) | [Plugins](docs/plugins.md) | [Experiment tracking](docs/experiment_tracking.md) | [Performance monitoring](docs/performance_monitoring.md) | [Reliability & caching](docs/reliability.md) | [Benchmark integrity](docs/benchmark_integrity.md) | [Security & privacy](docs/security_and_privacy.md)
 - **Datasets, metrics & configuration**: [Installation](docs/installation.md) | [Usage](docs/usage.md) | [Architecture](docs/architecture.md) | [Dataset catalog](docs/dataset_catalog.md) | [Core metrics](docs/metrics.md) | [Advanced metrics](docs/advanced_metrics.md) | [YAML profiles](docs/configuration.md) | [Historical tracking](docs/historical_tracking.md) | [v0.3 compatibility](docs/v0_3_compatibility.md)
-- **Project**: [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md) | [Security policy](SECURITY.md) | [v0.3.1 compatibility report](V0_3_1_COMPATIBILITY_REPORT.md)
+- **Project**: [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md) | [Security policy](SECURITY.md) | [Sponsorship](docs/sponsors.md) | [v0.3.1 compatibility report](V0_3_1_COMPATIBILITY_REPORT.md)
+
+---
+
+## Sponsors
+
+OpenBench AI is free and open source. If it saves you time, you can [support its development on GitHub Sponsors](https://github.com/sponsors/lakshaychhaba0001-sys). Sponsorship never affects results, rankings or defaults; see [how sponsorship works](docs/sponsors.md).
 
 ---
 
