@@ -38,11 +38,11 @@ def test_relative_links_resolve():
 
 def test_versions_are_consistent():
     pyproject = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
-    assert 'version = "0.5.0"' in pyproject
-    assert openbench.__version__ == "0.5.0"
-    assert 'version: "0.5.0"' in (ROOT / "CITATION.cff").read_text(encoding="utf-8")
-    assert "## [0.5.0]" in (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
-    assert "# OpenBench AI (v0.5.0)" in (ROOT / "README.md").read_text(encoding="utf-8")
+    assert 'version = "0.5.1"' in pyproject
+    assert openbench.__version__ == "0.5.1"
+    assert 'version: "0.5.1"' in (ROOT / "CITATION.cff").read_text(encoding="utf-8")
+    assert "## [0.5.1]" in (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
+    assert "# OpenBench AI (v0.5.1)" in (ROOT / "README.md").read_text(encoding="utf-8")
 
 
 def test_project_wording_and_authorship_preserved():

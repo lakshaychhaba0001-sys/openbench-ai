@@ -4,6 +4,46 @@ All notable changes to **OpenBench AI** are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.1] - 2026-11-28
+
+Fixes, smaller commands and documentation from contributors since v0.5.0. The larger v0.6.0 themes are still planned in the [roadmap](ROADMAP.md). No breaking changes to commands, public Python names, run directories, datasets or scores; the core install still has no runtime dependencies. One behaviour change: several commands now choose their output format from the `--output` file name when `--format` isn't given (see **Changed**).
+
+### Added
+- **Cache maintenance:** `openbench cache prune --older-than DAYS [--dry-run]` removes old cached responses safely (#77, #160), and `--provider NAME` / `--model NAME` remove one provider's or model's entries (#173, #187). `openbench cache stats` shows entries per provider and model, the oldest and newest entry, and gains `--format text` (#161, #163).
+- **`openbench history compare BASELINE_ID LATEST_ID`** shows the score change for every metric two recorded evaluations share, as text, JSON or Markdown. It is descriptive and points to `openbench analyze` for a significance test (#158, #166).
+- **More table formats:** `runs list --format csv|markdown` (#114, #115), with one column per metric under `--wide` (#120, #121); `history list --format csv|markdown` (#156, #157); `dataset-stats --format markdown` (#147, #181); `dataset-card --format html` (#96, #142).
+- **Run filters:** `runs list --model` and `--dataset` (#149, #177; #180, #189).
+- **Dashboard (`openbench serve`):** `--open` opens it in a browser, including for wildcard binds (#59, #102; #104, #108); the runs list can be filtered by status, provider, repeat group, model and dataset through clickable, escaped links (#126, #135; #137, #141, #148; #177; #189); runs with more than 500 items are paged (#66, #125).
+- **Docker:** a `Dockerfile` that runs as a non-root user, a `.dockerignore`, a CI job that builds the image and runs a mock evaluation in it, and container instructions in the installation guide, including reaching Ollama on the host (#89, #178, #184).
+- **Example:** `examples/v050_rank_and_plan.py` ranks three mock models and plans a sample size, offline (#64, #186).
+- **Documentation links in reports:** Markdown reports end with links to the reading guide and glossary, and HTML pages link to them (#105, #117; #118, #128; #130, #134; #138, #140).
+- Documentation and changelog links in the package metadata (#119, #139).
+
+### Changed
+- **The output format follows the `--output` file name** when `--format` isn't given. An explicit `--format` always wins, and output printed to the terminal is unchanged.
+  - `dataset-card`: `.json` gives JSON and `.html`/`.htm` HTML; anything else stays Markdown (#145, #151).
+  - `rank`: `.html`/`.htm`, `.json` and `.csv` give those formats; anything else stays Markdown (#152, #159).
+  - `audit-contamination` and `judge`: `.json` and `.csv` give those formats; anything else stays Markdown (#171, #182).
+  - `analyze`: `.html`/`.htm`, `.md`/`.markdown` and `.csv` give those formats; anything else stays JSON (#162, #169).
+  - `preferences analyze`: `.md`/`.markdown` and `.csv` give those formats; anything else stays JSON (#172, #174).
+  - `validate-dataset --quality-checks --output` (#176, #179) and `runs verify --quality-checks --audit-output` (#183, #194): `.md`/`.markdown` and `.csv` give those formats; anything else stays JSON. Both now say when `--output` or `--audit-output` is ignored because `--quality-checks` is missing, instead of writing nothing silently.
+- `evaluate --output` and `compare --output` accept `.markdown`, and print a note when a path with an unsupported extension is used as a folder (#133, #143; #144, #155).
+
+### Fixed
+- `analyze` and `rank` now use the `score_kind` a plugin metric declares. Before, a plugin metric was treated as "unknown" in a fresh process, so it got the interval-only analysis instead of its exact test (#107, #188).
+- CSV reports no longer get doubled line endings on Windows (#129, #131).
+- `openbench --version` prints on one line at any terminal width (#109, #110).
+- Dataset cards show the licence and source when every record shares them (#65, #95).
+
+### Documentation
+- A glossary of statistical report terms, linked from the report guides (#63, #97; #99, #100; #101, #103).
+- A custom metric tutorial (#88, #106), a fine-tuning comparison cookbook with real-provider and `--stratum-tests` sections (#68, #111; #113, #124), and a model ranking cookbook (#127, #164).
+- The README links the documentation site (#62, #116). The v0.6.0 roadmap replaces the v0.5.0 one (#154).
+- A short page on how sponsorship works (#195).
+
+### Maintenance
+- Dependabot keeps the GitHub Actions in the workflows up to date (#87, #165, #170).
+
 ## [0.5.0] - 2026-11-15
 
 All of the [v0.5.0 roadmap](https://github.com/lakshaychhaba0001-sys/openbench-ai/blob/v0.5.0/ROADMAP.md) themes, in four milestones. No breaking changes: v0.4.0 commands, public Python names, run directories, datasets and scores keep working, and the core install has no runtime dependencies.

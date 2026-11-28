@@ -1,6 +1,6 @@
 <div align="center">
 
-# OpenBench AI (v0.5.0)
+# OpenBench AI (v0.5.1)
 
 **Is the difference between two LLMs real, or noise?**
 
@@ -48,6 +48,8 @@ python examples/v040_workflow.py demo   # writes comparison, variability, prefer
 ---
 
 ## What's new in v0.5.0
+
+> **v0.5.1** adds smaller commands, fixes and documentation from contributors: `history compare`, cache maintenance, run filters, a Docker image, and output formats chosen from the `--output` file name. See the [changelog](CHANGELOG.md).
 
 - **Any model.** `--provider openai_compatible` runs any server with a `/v1/chat/completions` endpoint: vLLM, LM Studio, llama.cpp server or a hosted API. The API key is read from an environment variable and never stored. `--max-requests-per-minute` and `Retry-After` handling keep hosted runs under rate limits. ([providers](docs/providers.md))
 - **Rank several models**: `openbench rank` gives rank intervals from Holm-corrected pairwise tests, so you can see which models the data can tell apart. ([ranking and planning](docs/ranking_and_planning.md))
@@ -284,8 +286,8 @@ If you use OpenBench AI in your research, please cite it using the following Bib
 @software{chhaba2026openbench,
   author  = {Chhaba, Lakshay},
   title   = {OpenBench AI},
-  version = {0.5.0},
-  date    = {2026-11-15},
+  version = {0.5.1},
+  date    = {2026-11-28},
   url     = {https://github.com/lakshaychhaba0001-sys/openbench-ai},
   license = {MIT}
 }
